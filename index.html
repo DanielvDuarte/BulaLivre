@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BulaLivre — Consulta de Medicamentos</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e232c; --line:#2a303b;
+    --txt:#e7ebf0; --muted:#9aa4b2; --accent:#4f9dff; --accent2:#2b6fd1;
+    --ok:#39b67a; --warn:#e0a53b; --danger:#e06060; --chip:#232a34;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f4f6f9; --panel:#fff; --panel2:#f0f3f7; --line:#dde3ec;
+      --txt:#1b2430; --muted:#5e6b7b; --accent:#2b6fd1; --accent2:#1d5bb5;
+      --ok:#1f8f5a; --warn:#b5801d; --danger:#c23b3b; --chip:#eaeef4;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.45}
+  header{position:sticky;top:0;z-index:20;background:var(--panel);
+    border-bottom:1px solid var(--line);padding:12px 16px}
+  .wrap{max-width:900px;margin:0 auto}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  h1{font-size:18px;margin:0;display:flex;align-items:center;gap:8px}
+  .meta{color:var(--muted);font-size:11.5px;margin-top:3px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  button{font-family:inherit;font-size:13px;padding:8px 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .search{display:flex;gap:8px;margin-top:12px}
+  #q{flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--txt);font-size:16px;outline:none}
+  #q:focus{border-color:var(--accent)}
+  .filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);
+    background:var(--chip);color:var(--muted);font-size:12.5px;cursor:pointer;user-select:none}
+  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  main{max-width:900px;margin:0 auto;padding:16px}
+  .count{color:var(--muted);font-size:13px;margin:4px 2px 12px}
+  .note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--warn);
+    border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-bottom:12px}
+  .card h2{margin:0;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pa{color:var(--muted);font-weight:400;font-size:13px;margin-top:2px}
+  .tag{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .t-mip{background:rgba(57,182,122,.15);color:var(--ok)}
+  .t-presc{background:rgba(224,165,59,.15);color:var(--warn)}
+  .t-ctrl{background:rgba(224,96,96,.15);color:var(--danger)}
+  .t-na{background:var(--chip);color:var(--muted)}
+  .row{display:flex;gap:8px;margin-top:8px;font-size:13.5px}
+  .row .k{color:var(--muted);min-width:96px;flex-shrink:0}
+  .lab{font-size:12px;color:var(--muted);margin-top:6px}
+  .inds{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+  .ind{font-size:11.5px;background:var(--panel2);border:1px solid var(--line);
+    padding:2px 8px;border-radius:6px;color:var(--muted)}
+  mark{background:var(--accent);color:#fff;border-radius:3px;padding:0 2px}
+  .empty{text-align:center;color:var(--muted);padding:40px 10px}
+  .more{text-align:center;margin:6px 0 20px}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--accent2);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90%}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer{max-width:900px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);font-size:11.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>💊 BulaLivre</h1>
+        <div class="meta" id="meta">carregando base…</div>
+      </div>
+      <div class="actions">
+        <button id="btnUpdate" title="Recarrega a base de dados mais recente publicada">↻ Atualizar</button>
+        <button id="btnDownload" class="primary" title="Baixa uma cópia completa que funciona sem internet">⤓ Baixar offline</button>
+      </div>
+    </div>
+    <div class="search">
+      <input id="q" type="search" placeholder='Busque sintoma ("dor de cabeça"), remédio ("dipirona") ou laboratório' autofocus>
+    </div>
+    <div class="filters" id="filters"></div>
+  </div>
+</header>
+<main>
+  <div class="note">
+    ⚕️ Material de <b>referência</b> — não substitui a bula nem a orientação de médico/farmacêutico.
+    Fonte dos dados: <b>Bulário Eletrônico / Dados Abertos da ANVISA</b>.
+  </div>
+  <div class="count" id="count"></div>
+  <div id="results"></div>
+  <div class="more" id="more"></div>
+</main>
+<footer id="footer"></footer>
+<div id="toast"></div>
+
+<script>
+/* === INÍCIO DADOS EMBUTIDOS — não edite a linha abaixo manualmente ===
+   No modo online esta variável fica null e o app busca o arquivo bulas.json.
+   Ao clicar em "Baixar offline", o app injeta a base inteira nesta linha,
+   gerando um arquivo HTML autossuficiente que roda sem internet. */
+let EMBEDDED_DATA = null; /*__EMBED_SLOT__*/
+
+const OFFLINE = EMBEDDED_DATA !== null;
+let DATA = {versao:"—", atualizado_em:"", fonte:"", total:0, produtos:[]};
+let LIMIT = 200;
+
+const norm = s => (s||"").toString().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
+const TIPO = {mip:["Isento de prescrição","t-mip"], presc:["Sob prescrição","t-presc"],
+              ctrl:["Controlado","t-ctrl"], "":["—","t-na"]};
+
+const $ = id => document.getElementById(id);
+const elQ=$("q"), elRes=$("results"), elCount=$("count"), elMore=$("more"),
+      elFilters=$("filters"), elMeta=$("meta"), elFooter=$("footer");
+
+let activeTipo = null;
+
+async function loadData(bustCache){
+  if(OFFLINE){ DATA = EMBEDDED_DATA; afterLoad(); return; }
+  try{
+    const url = "bulas.json" + (bustCache ? ("?t="+Date.now()) : "");
+    const r = await fetch(url, {cache: bustCache ? "no-store" : "default"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    DATA = await r.json();
+    afterLoad();
+    if(bustCache) toast("Base atualizada — versão "+(DATA.versao||"?")+" ("+ (DATA.total||DATA.produtos.length) +" produtos)");
+  }catch(e){
+    elMeta.textContent = "Não foi possível carregar bulas.json ("+e.message+").";
+    elRes.innerHTML = '<div class="empty">Não encontrei <b>bulas.json</b> ao lado do index.html.<br>'+
+      'No GitHub Pages ele é gerado pelo workflow de atualização.</div>';
+  }
+}
+
+function afterLoad(){
+  const prods = DATA.produtos||[];
+  // índice de busca pré-computado
+  prods.forEach(p=>{ p._h = norm([p.nome,p.pa,p.laboratorio,p.classe,p.cat,(p.sintomas||[]).join(" ")].join(" | ")); });
+  DATA.total = DATA.total || prods.length;
+  const d = DATA.atualizado_em ? new Date(DATA.atualizado_em) : null;
+  const quando = d && !isNaN(d) ? d.toLocaleDateString("pt-BR") : (DATA.versao||"—");
+  elMeta.innerHTML = (DATA.total.toLocaleString("pt-BR"))+" produtos · versão "+quando +
+                     (OFFLINE ? ' · <b>cópia offline</b>' : '');
+  elFooter.textContent = "Fonte: "+(DATA.fonte||"ANVISA — Dados Abertos")+
+     (OFFLINE ? " · Esta é uma cópia offline; para atualizar, baixe de novo no site." : "");
+  if(OFFLINE){ $("btnUpdate").style.display="none"; }
+  buildFilters();
+  render();
+}
+
+function buildFilters(){
+  elFilters.innerHTML="";
+  const defs=[["Todos",null],["Isento",["mip"]],["Prescrição",["presc"]],["Controlado",["ctrl"]]];
+  defs.forEach(([label,val])=>{
+    const c=document.createElement("div");
+    c.className="chip"+((JSON.stringify(val)===JSON.stringify(activeTipo))?" active":"");
+    c.textContent=label;
+    c.onclick=()=>{activeTipo=val; LIMIT=200; buildFilters(); render();};
+    elFilters.appendChild(c);
+  });
+}
+
+function hl(text,q){
+  if(!q) return esc(text);
+  const t=esc(text), nt=norm(text), nq=norm(q), i=nt.indexOf(nq);
+  if(i<0||!nq) return t;
+  // mapeia índice normalizado -> original aproximado (comprimentos iguais p/ acentos simples)
+  return t.slice(0,i)+"<mark>"+t.slice(i,i+q.length)+"</mark>"+t.slice(i+q.length);
+}
+function esc(s){return (s||"").toString().replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function match(p,words){
+  if(!words.length) return true;
+  return words.every(w=>p._h.includes(w));
+}
+
+function render(){
+  const q=elQ.value.trim();
+  const words=norm(q).split(/\s+/).filter(Boolean);
+  let list=(DATA.produtos||[]).filter(p=>{
+    if(activeTipo && !activeTipo.includes(p.tipo||"")) return false;
+    return match(p,words);
+  });
+  const total=list.length;
+  elCount.textContent = total
+    ? `${total.toLocaleString("pt-BR")} resultado(s)${q?` para "${q}"`:""}` : "";
+  if(!total){
+    elRes.innerHTML=`<div class="empty">Nada encontrado${q?` para "<b>${esc(q)}</b>"`:""}.<br>
+      Tente um sintoma (<i>febre</i>, <i>azia</i>, <i>cólica</i>), um remédio ou um laboratório.</div>`;
+    elMore.innerHTML=""; return;
+  }
+  const shown=list.slice(0,LIMIT);
+  elRes.innerHTML=shown.map(p=>card(p,q)).join("");
+  elMore.innerHTML = total>LIMIT
+    ? `<button id="moreBtn">Mostrar mais (${(total-LIMIT).toLocaleString("pt-BR")} restantes)</button>`
+    : "";
+  const mb=$("moreBtn"); if(mb) mb.onclick=()=>{LIMIT+=200; render();};
+}
+
+function card(p,q){
+  const [tl,tc]=TIPO[p.tipo||""]||TIPO[""];
+  const sint=(p.sintomas||[]);
+  return `<div class="card">
+    <h2>${hl(p.nome,q)} <span class="tag ${tc}">${tl}</span></h2>
+    ${p.pa?`<div class="pa">${hl(p.pa,q)}${p.classe?" · "+esc(p.classe):""}</div>`:(p.classe?`<div class="pa">${esc(p.classe)}</div>`:"")}
+    ${p.laboratorio?`<div class="lab">🏭 ${hl(p.laboratorio,q)}</div>`:""}
+    ${p.uso?`<div class="row"><span class="k">Para que serve</span><span>${esc(p.uso)}</span></div>`:""}
+    ${p.posologia?`<div class="row"><span class="k">Posologia</span><span>${esc(p.posologia)}</span></div>`:""}
+    ${p.alerta&&p.alerta!=="—"?`<div class="row"><span class="k">⚠️ Atenção</span><span>${esc(p.alerta)}</span></div>`:""}
+    ${sint.length?`<div class="inds">${sint.map(s=>`<span class="ind">${hl(s,q)}</span>`).join("")}</div>`:""}
+  </div>`;
+}
+
+let tmr; elQ.addEventListener("input",()=>{clearTimeout(tmr);tmr=setTimeout(()=>{LIMIT=200;render();},120);});
+
+$("btnUpdate").onclick=()=>{ $("btnUpdate").disabled=true; $("btnUpdate").textContent="atualizando…";
+  loadData(true).finally(()=>{ $("btnUpdate").disabled=false; $("btnUpdate").textContent="↻ Atualizar"; }); };
+
+$("btnDownload").onclick=downloadOffline;
+async function downloadOffline(){
+  const btn=$("btnDownload"); btn.disabled=true; const old=btn.textContent; btn.textContent="gerando…";
+  try{
+    let src;
+    try{ src=await (await fetch("index.html",{cache:"no-store"})).text(); }
+    catch(e){ src="<!DOCTYPE html>\n"+document.documentElement.outerHTML; }
+    let json=JSON.stringify(DATA).replace(/</g,"\\u003c");
+    src=src.replace(/let EMBEDDED_DATA = [\s\S]*?; \/\*__EMBED_SLOT__\*\//,
+        "let EMBEDDED_DATA = "+json+"; /*__EMBED_SLOT__*/");
+    const blob=new Blob([src],{type:"text/html"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="bulalivre-offline.html";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    toast("Arquivo offline gerado — salve no celular/computador");
+  }catch(e){ toast("Falha ao gerar o arquivo: "+e.message); }
+  finally{ btn.disabled=false; btn.textContent=old; }
+}
+
+let toastTmr;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTmr); toastTmr=setTimeout(()=>t.classList.remove("show"),3200); }
+
+loadData(false);
+</script>
+</body>
+</html>

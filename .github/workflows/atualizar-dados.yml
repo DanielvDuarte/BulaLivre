@@ -1,0 +1,39 @@
+name: Atualizar base da ANVISA
+
+# Roda:
+#  - manualmente (aba Actions -> "Run workflow")
+#  - automaticamente todo dia 1º do mês
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 1 * *"   # dia 1, 06:00 UTC (~03:00 BRT)
+
+permissions:
+  contents: write          # necessário para commitar o bulas.json atualizado
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Gerar bulas.json a partir dos Dados Abertos da ANVISA
+        run: python build/update_data.py
+
+      - name: Commitar se houve mudança
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain bulas.json)" ]; then
+            git add bulas.json
+            git commit -m "Atualiza base da ANVISA ($(date -u +%Y-%m-%d))"
+            git push
+          else
+            echo "Sem mudanças na base."
+          fi
