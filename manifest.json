@@ -1,0 +1,16 @@
+{
+  "name": "BulaLivre — Consulta de Medicamentos",
+  "short_name": "BulaLivre",
+  "description": "Consulta de medicamentos por sintoma, nome, princípio ativo e laboratório. Funciona offline.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1115",
+  "theme_color": "#2b6fd1",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

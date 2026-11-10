@@ -78,9 +78,23 @@ Produtos sem ativo mapeado continuam aparecendo na busca por **nome / laboratór
 
 ## Uso offline
 
-No site publicado, clique em **⤓ Baixar offline**. Isso gera `bulalivre-offline.html` com a base inteira
-embutida — salve no celular ou no computador e abra sem internet. Para atualizar a cópia, baixe de novo
-quando quiser.
+### Opção 1 — Instalar como app (recomendado no celular)
+
+O BulaLivre é um **PWA**: depois de abrir o site uma vez, dá para instalá-lo como ícone de app, e ele
+passa a funcionar **sem internet** (um *service worker* guarda o app e a base em cache).
+
+- **iPhone/iPad (Safari):** toque em **Compartilhar** → **Adicionar à Tela de Início**.
+- **Android (Chrome):** menu **⋮** → **Instalar app** / **Adicionar à tela inicial**.
+
+Toque no ícone criado e use offline. Quando houver internet, o botão **↻ Atualizar** busca a base mais nova;
+offline, ele continua abrindo a última versão baixada.
+
+> Requer HTTPS — o GitHub Pages já serve em HTTPS, então funciona direto.
+
+### Opção 2 — Baixar um arquivo único
+
+No site, clique em **⤓ Baixar offline** para gerar `bulalivre-offline.html` com a base embutida — um único
+arquivo que abre sem internet (melhor no computador). Para atualizar a cópia, baixe de novo.
 
 ## Observações legais
 

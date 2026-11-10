@@ -2,8 +2,16 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BulaLivre — Consulta de Medicamentos</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b6fd1">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BulaLivre">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
   :root{
     --bg:#0f1115; --panel:#171a21; --panel2:#1e232c; --line:#2a303b;
@@ -244,6 +252,29 @@ async function downloadOffline(){
 let toastTmr;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show");
   clearTimeout(toastTmr); toastTmr=setTimeout(()=>t.classList.remove("show"),3200); }
+
+// Service worker: habilita uso offline após a 1ª visita (só em http/https).
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+// Dica de instalação (iPhone/Android): como deixar como "app" offline.
+(function(){
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  if (standalone || OFFLINE) return;
+  if (localStorage.getItem("bl_dismiss_install")==="1") return;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const tip = document.createElement("div");
+  tip.className = "note";
+  tip.style.borderLeftColor = "var(--accent)";
+  tip.innerHTML = (isIOS
+    ? '📲 <b>Instalar no iPhone:</b> toque em <b>Compartilhar</b> (ícone de seta) e depois em <b>Adicionar à Tela de Início</b>. Vira um ícone de app e funciona offline.'
+    : '📲 <b>Instalar como app:</b> no menu do navegador, escolha <b>Instalar app</b> / <b>Adicionar à tela inicial</b>. Funciona offline.')
+    + ' <a href="#" id="blDismiss" style="white-space:nowrap">dispensar</a>';
+  const main = document.querySelector("main");
+  main.insertBefore(tip, main.firstChild);
+  document.getElementById("blDismiss").onclick = (ev)=>{ev.preventDefault();localStorage.setItem("bl_dismiss_install","1");tip.remove();};
+})();
 
 loadData(false);
 </script>
