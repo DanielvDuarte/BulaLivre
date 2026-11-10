@@ -96,6 +96,12 @@ def title_br(s):
     s = clean(s)
     return s.title() if s and s.isupper() else s
 
+def clean_lab(s):
+    s = clean(s)
+    # remove CNPJ no início do nome da empresa (ex.: "61099966000112 - Sanofi...")
+    s = re.sub(r"^\s*\d[\d./\-]{9,}\s*[-–]\s*", "", s)
+    return title_br(s)
+
 def resolve_sintomas(pa_text, mapa):
     npa = norm(pa_text)
     if not npa:
@@ -149,7 +155,7 @@ def main():
         nome = title_br(cell(row, "nome"))
         if not nome:
             continue
-        lab = title_br(cell(row, "lab"))
+        lab = clean_lab(cell(row, "lab"))
         pa = clean(cell(row, "pa"))
         key = (norm(nome), norm(lab))
         if key in seen:
