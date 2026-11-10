@@ -4,7 +4,7 @@
    - bulas.json: network-first (pega a versão mais nova quando há internet,
      cai no cache quando offline). Assim o botão "Atualizar" sempre traz o
      dado mais recente, mas sem internet continua funcionando. */
-const VERSION = "bulalivre-v1";
+const VERSION = "bulalivre-v2";
 const SHELL = [
   "./",
   "./index.html",
@@ -36,7 +36,7 @@ self.addEventListener("fetch", (e) => {
   // bulas.json -> network-first
   if (url.pathname.endsWith("/bulas.json") || url.pathname.endsWith("bulas.json")) {
     e.respondWith(
-      fetch(req).then((res) => {
+      fetch(req, { cache: "no-store" }).then((res) => {
         const copy = res.clone();
         caches.open(VERSION).then((c) => c.put("./bulas.json", copy));
         return res;
