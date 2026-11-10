@@ -97,6 +97,12 @@ def title_br(s):
     s = clean(s)
     return s.title() if s and s.isupper() else s
 
+def clean_name(s):
+    s = clean(s)
+    # remove lixo no início do nome (hífens, pontos, bullets, aspas, barras)
+    s = re.sub(r"^[\s\-–—.·•*\"'/\\]+", "", s).strip()
+    return s.title() if s and s.isupper() else s
+
 def clean_lab(s):
     s = clean(s)
     # remove CNPJ no início do nome da empresa (ex.: "61099966000112 - Sanofi...")
@@ -153,7 +159,7 @@ def main():
         situ = norm(cell(row, "situ"))
         if situ and ("valido" not in situ and "ativo" not in situ and "vigente" not in situ):
             continue  # pula registros cancelados/vencidos quando a coluna existe
-        nome = title_br(cell(row, "nome"))
+        nome = clean_name(cell(row, "nome"))
         if not nome:
             continue
         lab = clean_lab(cell(row, "lab"))
