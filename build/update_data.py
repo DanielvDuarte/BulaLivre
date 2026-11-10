@@ -16,7 +16,7 @@ Uso:
 Se o layout/URL do dataset da ANVISA mudar, ajuste --url (ou a variável de ambiente
 ANVISA_CSV_URL) e, se necessário, as listas de nomes de coluna em COLS abaixo.
 """
-import argparse, csv, io, json, os, re, sys, unicodedata, datetime, urllib.request
+import argparse, csv, html, io, json, os, re, sys, unicodedata, datetime, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -90,7 +90,8 @@ def classify_tipo(tarja, categoria):
     return ""
 
 def clean(s):
-    return re.sub(r"\s+", " ", (s or "").strip())
+    # a ANVISA codifica acentos como entidades HTML (ex.: &#193; = Á); decodifica aqui
+    return re.sub(r"\s+", " ", html.unescape(s or "").strip())
 
 def title_br(s):
     s = clean(s)
