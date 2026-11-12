@@ -134,6 +134,13 @@ def main():
     with open(args.mapa, encoding="utf-8") as f:
         mapa = json.load(f)
 
+    # informação geral por princípio ativo (para que serve / efeitos / cuidados)
+    info_path = os.path.join(HERE, "info_substancias.json")
+    info = []
+    if os.path.exists(info_path):
+        with open(info_path, encoding="utf-8") as f:
+            info = json.load(f).get("grupos", [])
+
     text = fetch(args.url)
     delim = sniff_delim(text[:5000])
     reader = csv.reader(io.StringIO(text), delimiter=delim)
@@ -187,6 +194,7 @@ def main():
         "fonte": "ANVISA — Dados Abertos (medicamentos registrados)",
         "fonte_url": args.url,
         "total": len(produtos),
+        "info": info,
         "produtos": produtos,
     }
     with open(args.out, "w", encoding="utf-8") as f:

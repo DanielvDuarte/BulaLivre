@@ -13,6 +13,7 @@ e tem um botão para **baixar uma cópia offline** (celular/computador).
 | `index.html` | O app (busca, filtros, botões Atualizar e Baixar offline). |
 | `bulas.json` | A base de dados. Já vem com uma base inicial curada; é **substituída** pela base completa da ANVISA quando a atualização roda. |
 | `build/update_data.py` | Baixa o dataset da ANVISA e gera o `bulas.json`. |
+| `build/info_substancias.json` | Resumo por princípio ativo (para que serve, efeitos colaterais, cuidados) mostrado na página do medicamento. Vai para o `bulas.json` no campo `info`. **Edite para ampliar.** |
 | `build/mapa_sintomas.json` | Mapa *princípio ativo → sintomas*. É o que faz a busca por sintoma funcionar. **Edite para melhorar a busca.** |
 | `.github/workflows/atualizar-dados.yml` | GitHub Action: atualiza a base (1 clique ou mensal). |
 

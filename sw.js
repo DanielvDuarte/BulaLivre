@@ -4,7 +4,7 @@
    - bulas.json: network-first (pega a versão mais nova quando há internet,
      cai no cache quando offline). Assim o botão "Atualizar" sempre traz o
      dado mais recente, mas sem internet continua funcionando. */
-const VERSION = "bulalivre-v3";
+const VERSION = "bulalivre-v4";
 const SHELL = [
   "./",
   "./index.html",

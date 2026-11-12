@@ -56,12 +56,25 @@
 
   /* ---------- campo de busca ---------- */
   .sbox{position:relative}
-  .sfield{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1.5px solid transparent;border-radius:12px;padding:0 6px 0 12px;height:44px;color:var(--muted)}
+  .sfield{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;background:var(--surface2);border:1.5px solid transparent;border-radius:12px;padding:4px 6px 4px 12px;min-height:44px;color:var(--muted)}
   .sfield:focus-within{border-color:var(--brand);background:var(--surface)}
-  .sfield input{flex:1;min-width:0;border:0;background:transparent;outline:none;font:inherit;font-size:16px;color:var(--ink);height:100%}
+  .sfield input{flex:1;min-width:120px;border:0;background:transparent;outline:none;font:inherit;font-size:16px;color:var(--ink);height:34px}
   .sfield input::placeholder{color:var(--muted)}
   .sfield input::-webkit-search-cancel-button{display:none}
   .sgo{border:0;background:var(--brand);color:#fff;font-weight:600;font-size:14px;border-radius:9px;padding:0 16px;height:34px}
+  .sc{display:inline-flex;align-items:center;gap:2px;background:var(--brand-soft);color:var(--brand2);border:1px solid var(--brand);border-radius:999px;padding:2px 3px 2px 11px;font-size:14px;font-weight:600;white-space:nowrap}
+  .sc button{border:0;background:transparent;color:inherit;font-size:18px;line-height:1;width:22px;height:22px;border-radius:50%;padding:0}
+  .sc button:hover{background:var(--brand);color:#fff}
+  .hero .sc{color:#115e59;background:#d7f0ec}
+  .symbox{margin:6px 0 14px}
+  .symbox .sfield{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+  .cov{font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);flex-shrink:0}
+  .cov.full{background:var(--ok-bg);color:var(--ok)}
+  .blk ul{margin:6px 0 0;padding-left:20px;font-size:15px}
+  .blk li{margin:3px 0}
+  .who{margin-top:8px;font-size:12.5px;font-weight:700;color:var(--brand)}
+  .muted{color:var(--muted)}
+  .alert.info{background:var(--brand-soft);border-left-color:var(--brand);font-size:13px;color:var(--ink)}
   .sgo:hover{background:var(--brand2)}
   .sug{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);
     border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);z-index:40;max-height:70vh;overflow:auto;display:none;text-align:left}
@@ -81,27 +94,16 @@
   .hero{background:radial-gradient(900px 300px at 85% -10%,rgba(255,255,255,.16),transparent 60%),
         radial-gradient(500px 260px at 0% 110%,rgba(20,184,166,.35),transparent 60%),
         linear-gradient(135deg,var(--hero1),var(--hero2));
-        color:#fff;padding:54px 16px 90px;text-align:center}
+        color:#fff;padding:48px 16px 64px;text-align:center;min-height:calc(100vh - 60px);display:flex;flex-direction:column;justify-content:center;align-items:center}
+  .hero .sbox{width:100%}
+  .explore{margin-top:22px;font-size:13px;opacity:.85}
+  .explore a{color:#fff;text-decoration:underline;text-underline-offset:3px}
   .hero h1{margin:0 0 8px;font-size:clamp(28px,6vw,44px);letter-spacing:-1px;line-height:1.1}
   .hero p{margin:0 auto 26px;max-width:520px;opacity:.9;font-size:clamp(14px,3.4vw,17px)}
   .hero .sbox{max-width:620px;margin:0 auto}
-  .hero .sfield{background:#fff;height:54px;border-radius:16px;padding-left:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);color:#5a6b66}
+  .hero .sfield{background:#fff;min-height:54px;border-radius:16px;padding-left:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);color:#5a6b66}
   .hero .sfield input{color:#0f2420}
   .hero .sgo{height:42px;padding:0 20px;border-radius:12px}
-  .quick{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px auto 0;max-width:640px;align-items:center}
-  .quick span{font-size:13px;opacity:.8}
-  .quick a{color:#fff;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:5px 12px;border-radius:999px;font-size:13px}
-  .quick a:hover{background:rgba(255,255,255,.28);text-decoration:none}
-  .stats{max-width:820px;margin:-52px auto 0;padding:0 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative}
-  .stat{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 8px;text-align:center;color:var(--ink);border:1px solid var(--line)}
-  .stat:hover{text-decoration:none;border-color:var(--brand);transform:translateY(-1px)}
-  .stat b{display:block;font-size:clamp(20px,4.6vw,30px);color:var(--brand);letter-spacing:-.5px;line-height:1.15}
-  .stat span{font-size:12.5px;color:var(--muted)}
-  .homebody{max-width:820px;margin:26px auto 0;padding:0 16px}
-  .about{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--muted);font-size:14px}
-  .about h2{margin:0 0 6px;font-size:16px;color:var(--ink)}
-  .about p{margin:0 0 8px}
-  .about p:last-child{margin:0}
 
   /* ---------- resultados ---------- */
   h1.title{font-size:clamp(20px,4.5vw,26px);margin:2px 0 4px;letter-spacing:-.4px}
@@ -175,9 +177,7 @@
   .loading{text-align:center;color:var(--muted);padding:60px 0}
 
   @media (max-width:560px){
-    .stats{grid-template-columns:repeat(2,1fr)}
     .hero{padding:40px 16px 80px}
-    .stats{margin-top:-46px}
     .logo span.t{display:none}
     body:not(.home) .logo span.t{display:none}
     .sgo{padding:0 12px}
@@ -279,9 +279,9 @@ function rank(list,q,key){
   return list.map(x=>{const n=key(x);return [n.startsWith(nq)?0:(n.split(/\s+/).some(w=>w.startsWith(nq))?1:2),x];})
              .sort((a,b)=>a[0]-b[0]||(key(a[1])<key(b[1])?-1:key(a[1])>key(b[1])?1:0)).map(x=>x[1]);
 }
-function searchProds(q,tipo){
+function searchProds(q,tipo,nameOnly){
   const words=norm(q).split(/\s+/).filter(Boolean);
-  const list=PRODS.filter(p=>(!tipo||p.tipo===tipo) && words.every(w=>p._h.includes(w)));
+  const list=PRODS.filter(p=>(!tipo||p.tipo===tipo) && words.every(w=>(nameOnly?p._n+" "+norm(p.pa):p._h).includes(w)));
   return rank(list,q,p=>p._n);
 }
 function searchAgg(arr,q){
@@ -315,41 +315,109 @@ function route(){
   if(!PRODS.length && !DATA.produtos.length){ return; }
   if(view===""){ app.innerHTML=viewHome(); document.title="BulaLivre — Consulta de Medicamentos"; }
   else if(view==="busca"){ app.innerHTML=viewSearch(params); }
+  else if(view==="sintomas"){ app.innerHTML=viewSintomas(params); }
   else if(view==="medicamento"){ app.innerHTML=viewDetail(parts[1]||""); }
   else if(view==="lista"){ app.innerHTML=viewList(parts[1],parts.slice(2).join("/"),params); }
   else { location.hash="#/"; return; }
   const q = view==="busca" ? (params.get("q")||"") : "";
   lastQ=q;
-  mountSearch($("topSearch"),q,"Buscar medicamento, princípio ativo, sintoma…");
-  const hs=$("heroSearch"); if(hs) mountSearch(hs,"","Digite o medicamento, princípio ativo, sintoma ou laboratório",true);
-  const dm=$("dismissTip"); if(dm) dm.onclick=()=>{try{localStorage.setItem("bl_dismiss_install","1");}catch(e){} $("tip").remove();};
+  mountSearch($("topSearch"),{val:q,ph:"Buscar medicamento, sintoma…"});
+  const hs=$("heroSearch"); if(hs) mountSearch(hs,{ph:"Digite seus sintomas ou o nome do remédio",hero:true,multi:true});
+  const ss=$("symSearch"); if(ss) mountSearch(ss,{ph:"Adicionar sintoma…",multi:true,live:true,chips:symNames(params),focus:!!params.get("f")});
 }
 window.addEventListener("hashchange",route);
 
-/* ---------- busca com sugestões ---------- */
-function mountSearch(box,val,ph,hero){
+/* ---------- busca com sugestões (e vários sintomas) ---------- */
+function resolveSymptom(text,exact){
+  const k=norm(text); if(!k) return null;
+  if(PAT_MAP.has(k)) return PAT_MAP.get(k);
+  if(exact) return null;
+  const byCount=(a,b)=>b.prods.length-a.prods.length;
+  const pre=PATS.filter(e=>e.k.startsWith(k)).sort(byCount);
+  if(pre.length) return pre[0];
+  const inc=PATS.filter(e=>e.k.includes(k)).sort(byCount);
+  return inc[0]||null;
+}
+// "dor de cabeça e febre", "febre, tosse", "febre + coriza" -> lista de sintomas (ou null)
+function splitSymptoms(q){
+  const parts=q.split(/\s*(?:,|;|\+|\be\b)\s*/i).filter(Boolean);
+  if(parts.length<2) return null;
+  const out=[];
+  for(const p of parts){ const r=resolveSymptom(p); if(!r) return null; if(!out.includes(r)) out.push(r); }
+  return out;
+}
+
+function mountSearch(box,o){
+  o=o||{};
+  const multi=!!o.multi; let chips=[...(o.chips||[])];
   box.innerHTML=`<form class="sfield" role="search" autocomplete="off">${ICON.search}
-    <input type="search" enterkeyhint="search" placeholder="${esc(ph)}" value="${esc(val)}" aria-label="Buscar">
-    ${hero?'<button class="sgo" type="submit">Buscar</button>':''}</form><div class="sug"></div>`;
+    <input type="search" enterkeyhint="search" aria-label="Buscar" value="${esc(o.val||"")}">
+    ${o.hero?'<button class="sgo" type="submit">Buscar</button>':''}</form><div class="sug"></div>`;
   const form=box.querySelector("form"), inp=box.querySelector("input"), sug=box.querySelector(".sug");
   let sel=-1, tm;
-  const go=()=>{ sug.classList.remove("open"); const q=inp.value.trim(); location.hash=href("busca",{q}); inp.blur(); };
-  form.onsubmit=e=>{e.preventDefault(); const cur=sug.querySelector("a.sel"); if(cur) {sug.classList.remove("open"); location.hash=cur.getAttribute("href");} else go();};
-  const draw=()=>{
-    const q=inp.value.trim(); sel=-1;
-    if(norm(q).length<2){ sug.classList.remove("open"); return; }
-    const P=searchProds(q).slice(0,5), S=searchAgg(SUBS,q).slice(0,3), L=searchAgg(LABS,q).slice(0,2), T=searchAgg(PATS,q).slice(0,3);
-    let h="";
-    if(P.length) h+="<h6>Medicamentos</h6>"+P.map(p=>`<a href="${hMed(p)}"><span>${hl(p.nome,q)}</span><small>${esc(p.laboratorio)}</small></a>`).join("");
-    if(S.length) h+="<h6>Princípios ativos</h6>"+S.map(e=>`<a href="${hList("substancia",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
-    if(T.length) h+="<h6>Patologias / sintomas</h6>"+T.map(e=>`<a href="${hList("patologia",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
-    if(L.length) h+="<h6>Laboratórios</h6>"+L.map(e=>`<a href="${hList("laboratorio",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
-    h+=`<a class="all" href="${href("busca",{q})}">Ver todos os resultados para “${esc(q)}”</a>`;
-    sug.innerHTML=h; sug.classList.add("open");
+  const toSymptoms=()=>{ location.hash=chips.length?href("sintomas",{s:chips.join("|"),f:o.live?1:""}):"#/"; };
+  const drawChips=()=>{
+    form.querySelectorAll(".sc").forEach(x=>x.remove());
+    chips.forEach(n=>{
+      const s=document.createElement("span"); s.className="sc";
+      s.innerHTML=esc(n)+'<button type="button" aria-label="Remover '+esc(n)+'">×</button>';
+      s.querySelector("button").onclick=()=>{ chips=chips.filter(c=>norm(c)!==norm(n)); drawChips(); if(o.live) toSymptoms(); else inp.focus(); };
+      form.insertBefore(s,inp);
+    });
+    inp.placeholder = chips.length ? "adicionar outro sintoma…" : (o.ph||"");
   };
-  inp.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(draw,120);});
-  inp.addEventListener("focus",()=>{ if(inp.value.trim().length>=2) draw(); });
+  const addChip=n=>{
+    if(!chips.some(c=>norm(c)===norm(n))) chips.push(n);
+    inp.value=""; drawChips(); sug.classList.remove("open");
+    if(o.live) toSymptoms(); else { inp.focus(); draw(); }
+  };
+  const submit=()=>{
+    sug.classList.remove("open");
+    let t=inp.value.trim();
+    if(multi){
+      const parts=t?splitSymptoms(t):null;
+      if(parts){ parts.forEach(e=>{ if(!chips.some(c=>norm(c)===norm(e.nome))) chips.push(e.nome); }); t=""; }
+      else if(t){ const r=resolveSymptom(t,!chips.length); if(r){ if(!chips.some(c=>norm(c)===norm(r.nome))) chips.push(r.nome); t=""; } }
+      if(chips.length){ inp.value=""; toSymptoms(); inp.blur(); return; }
+    }else if(t){
+      const parts=splitSymptoms(t)||(resolveSymptom(t,true)?[resolveSymptom(t,true)]:null);
+      if(parts){ location.hash=href("sintomas",{s:parts.map(e=>e.nome).join("|")}); inp.blur(); return; }
+    }
+    location.hash=href("busca",{q:t}); inp.blur();
+  };
+  form.onsubmit=e=>{
+    e.preventDefault();
+    const cur=sug.querySelector("a.sel");
+    if(cur){ if(cur.dataset.sym!==undefined) addChip(cur.dataset.sym); else { sug.classList.remove("open"); location.hash=cur.getAttribute("href"); } }
+    else submit();
+  };
+  const symA=(e,q)=>`<a href="#" data-sym="${esc(e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`;
+  function draw(){
+    const q=inp.value.trim(); sel=-1;
+    const chosen=new Set(chips.map(norm));
+    let h="";
+    if(multi && (chips.length || !q)){
+      // modo "montar lista de sintomas": só sugere sintomas
+      let T = q ? searchAgg(PATS,q) : topSymptoms(10);
+      T=T.filter(e=>!chosen.has(e.k)).slice(0,q?8:10);
+      if(!T.length){ sug.classList.remove("open"); return; }
+      h=`<h6>${q?"Sintomas":"Sintomas comuns"}${chips.length?" — toque para somar":""}</h6>`+T.map(e=>symA(e,q)).join("");
+    }else{
+      if(norm(q).length<2){ sug.classList.remove("open"); return; }
+      const P=searchProds(q,"",true).slice(0,5), S=searchAgg(SUBS,q).slice(0,3), L=searchAgg(LABS,q).slice(0,2), T=searchAgg(PATS,q).slice(0,4);
+      const hP = P.length ? "<h6>Medicamentos</h6>"+P.map(p=>`<a href="${hMed(p)}"><span>${hl(p.nome,q)}</span><small>${esc(p.laboratorio)}</small></a>`).join("") : "";
+      const hT = T.length ? "<h6>Sintomas / patologias</h6>"+T.map(e=>multi?symA(e,q):`<a href="${hList("patologia",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("") : "";
+      h += multi ? hT+hP : hP+hT;
+      if(S.length) h+="<h6>Princípios ativos</h6>"+S.map(e=>`<a href="${hList("substancia",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
+      if(L.length) h+="<h6>Laboratórios</h6>"+L.map(e=>`<a href="${hList("laboratorio",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
+      h+=`<a class="all" href="${href("busca",{q})}">Ver todos os resultados para “${esc(q)}”</a>`;
+    }
+    sug.innerHTML=h; sug.classList.add("open");
+  }
+  inp.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(draw,100);});
+  inp.addEventListener("focus",()=>{ if(multi||inp.value.trim().length>=2) draw(); });
   inp.addEventListener("keydown",e=>{
+    if(e.key==="Backspace" && !inp.value && chips.length){ chips.pop(); drawChips(); if(o.live) toSymptoms(); return; }
     const items=[...sug.querySelectorAll("a")];
     if(e.key==="Escape"){ sug.classList.remove("open"); return; }
     if(!sug.classList.contains("open")||!items.length) return;
@@ -361,7 +429,13 @@ function mountSearch(box,val,ph,hero){
       if(items[sel]) items[sel].scrollIntoView({block:"nearest"});
     }
   });
-  sug.addEventListener("click",()=>sug.classList.remove("open"));
+  sug.addEventListener("click",e=>{
+    const a=e.target.closest("a"); if(!a) return;
+    if(a.dataset.sym!==undefined){ e.preventDefault(); addChip(a.dataset.sym); }
+    else sug.classList.remove("open");
+  });
+  drawChips();
+  if(o.focus) inp.focus();
 }
 document.addEventListener("click",e=>{ document.querySelectorAll(".sug.open").forEach(s=>{ if(!s.parentElement.contains(e.target)) s.classList.remove("open"); }); });
 
@@ -396,35 +470,16 @@ function topSymptoms(n){
   return [...PATS].sort((a,b)=>b.prods.length-a.prods.length).slice(0,n);
 }
 function viewHome(){
-  const quick=topSymptoms(6).map(e=>`<a href="${hList("patologia",e.nome)}">${esc(e.nome)}</a>`).join("");
-  let tip="";
-  try{
-    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-    if(!standalone && !OFFLINE && localStorage.getItem("bl_dismiss_install")!=="1"){
-      const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
-      tip=`<div class="note tip" id="tip"><span>📲 <b>Instalar como app:</b> ${ios
-        ? 'toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.'
-        : 'no menu do navegador, escolha <b>Instalar app</b> / <b>Adicionar à tela inicial</b>.'} Funciona offline.</span>
-        <button id="dismissTip">dispensar</button></div>`;
-    }
-  }catch(e){}
   return `<section class="hero">
       <h1>Consulta de medicamentos</h1>
-      <p>Pesquise por medicamento, princípio ativo, patologia ou laboratório — base aberta da ANVISA.</p>
+      <p>Pesquise por medicamento ou some seus sintomas — ex.: <i>dor de cabeça</i> + <i>febre</i>.</p>
       <div class="sbox" id="heroSearch"></div>
-      ${quick?`<div class="quick"><span>Mais buscados:</span>${quick}</div>`:""}
-    </section>
-    <div class="stats">
-      <a class="stat" href="${href("busca",{aba:"produtos"})}"><b>${nf(PRODS.length)}</b><span>Produtos</span></a>
-      <a class="stat" href="${href("busca",{aba:"substancias"})}"><b>${nf(SUBS.length)}</b><span>Princípios ativos</span></a>
-      <a class="stat" href="${href("busca",{aba:"laboratorios"})}"><b>${nf(LABS.length)}</b><span>Laboratórios</span></a>
-      <a class="stat" href="${href("busca",{aba:"patologias"})}"><b>${nf(PATS.length)}</b><span>Patologias</span></a>
-    </div>
-    <div class="homebody">${tip}
-      <div class="about"><h2>Sobre o BulaLivre</h2>
-        <p>Reúne informações de produtos farmacêuticos registrados no Brasil, a partir dos <b>Dados Abertos da ANVISA</b>, para consulta rápida por nome, substância, laboratório ou sintoma.</p>
-        <p>Este conteúdo é um <b>complemento</b> e não substitui a bula, a receita ou a orientação de um médico ou farmacêutico.</p></div>
-    </div>`;
+      <div class="explore">Explorar:
+        <a href="${href("busca",{aba:"produtos"})}">Produtos</a> ·
+        <a href="${href("busca",{aba:"substancias"})}">Princípios ativos</a> ·
+        <a href="${href("busca",{aba:"patologias"})}">Patologias</a> ·
+        <a href="${href("busca",{aba:"laboratorios"})}">Laboratórios</a></div>
+    </section>`;
 }
 
 const ABAS=[["todos","Todos"],["produtos","Produtos"],["substancias","Substâncias"],["patologias","Patologias"],["laboratorios","Laboratórios"]];
@@ -482,6 +537,81 @@ function viewList(kind,name,params){
 
 function backBtn(){ return `<button class="back" onclick="history.length>1?history.back():(location.hash='#/')">${ICON.back} Voltar</button>`; }
 
+/* informação geral (uso, efeitos, cuidados) por princípio ativo */
+function infoFor(p){
+  const INFO=DATA.info||[]; const groups=[];
+  p._subs.forEach(s=>{
+    const ns=norm(s);
+    const g=INFO.find(g=>g.chaves.some(c=>ns.includes(c)));
+    if(!g) return;
+    let e=groups.find(x=>x.g===g);
+    if(!e){ e={g,subs:[]}; groups.push(e); }
+    e.subs.push(cap(s));
+  });
+  return groups;
+}
+const ul=a=>`<ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+
+function viewSintomas(params){
+  const names=symNames(params);
+  document.title=(names.length?names.join(" + ")+" — ":"")+"Sintomas · BulaLivre";
+  const builder=`<div class="sbox symbox" id="symSearch"></div>`;
+  if(!names.length) return `<div class="page"><h1 class="title">Buscar por sintomas</h1>
+    <div class="sub">Adicione um ou mais sintomas para ver os medicamentos indicados.</div>${builder}${noteBox()}</div>`;
+  const tipo=params.get("tipo")||"";
+  const aba=params.get("aba")==="produtos"?"produtos":"substancias";
+  const page=Math.max(1,parseInt(params.get("p"))||1);
+  const ents=names.map(n=>PAT_MAP.get(norm(n)));
+  const n=ents.length;
+  const sets=ents.map(e=>new Set(e.prods));
+  // produtos: quantos dos sintomas escolhidos cada um cobre
+  const cnt=new Map();
+  ents.forEach(e=>e.prods.forEach(p=>{ if(!tipo||p.tipo===tipo) cnt.set(p,(cnt.get(p)||0)+1); }));
+  const byName=(a,b)=>a._n<b._n?-1:a._n>b._n?1:0;
+  const prods=[...cnt].map(([p,c])=>({p,c})).sort((a,b)=>b.c-a.c||byName(a.p,b.p));
+  // princípios ativos (só produtos de 1 substância, para a cobertura ser fiel)
+  const subs=new Map();
+  cnt.forEach((c,p)=>{
+    if(p._subs.length!==1) return;
+    const k=norm(p._subs[0]); let s=subs.get(k);
+    if(!s){ s={e:SUB_MAP.get(k),c:0,np:0}; subs.set(k,s); }
+    s.c=c; s.np++;
+  });
+  const sarr=[...subs.values()].filter(s=>s.e).sort((a,b)=>b.c-a.c||(b.np-a.np));
+  const fullS=sarr.filter(s=>s.c===n).length, fullP=prods.filter(x=>x.c===n).length;
+  const cntA={substancias:sarr.length,produtos:prods.length};
+  const tab=(k,l)=>`<a class="tab${k===aba?" on":""}" href="${href("sintomas",{s:names.join("|"),aba:k==="substancias"?"":k,tipo})}">${l}<i>${nf(cntA[k])}</i></a>`;
+  const filt=`<div class="filters"><span>Tipo:</span>${[["","Todos"],["mip","Isento de prescrição"],["presc","Sob prescrição"],["ctrl","Controlado"]].map(([v,l])=>
+    `<a class="chip${tipo===v?" on":""}" href="${href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo:v})}">${l}</a>`).join("")}</div>`;
+  const cov=(c)=>`<span class="cov${c===n?" full":""}" title="Cobre ${c} de ${n} sintomas">${c}/${n}</span>`;
+  const arr = aba==="substancias" ? sarr : prods;
+  const rows = arr.slice(PAGE*(page-1),PAGE*page).map(x=>{
+    if(aba==="substancias"){
+      const rep=x.e.prods.find(p=>p._subs.length===1);
+      const g=rep?infoFor(rep)[0]:null;
+      return `<a class="item" href="${hList("substancia",x.e.nome)}"><span class="ico">${ICON.flask}</span>
+        <span class="tx"><div class="nm">${esc(x.e.nome)}</div><div class="sb">${g?esc(g.g.uso):nf(x.np)+" produto"+(x.np===1?"":"s")}</div></span>
+        ${n>1?cov(x.c):""}<span class="go">${ICON.chev}</span></a>`;
+    }
+    return prodItem(x.p,"").replace('<span class="go">',(n>1?cov(x.c):"")+'<span class="go">');
+  }).join("");
+  let msg="";
+  if(n>1){
+    const full = aba==="substancias"?fullS:fullP;
+    msg = full
+      ? `<div class="sub"><b>${nf(full)}</b> ${aba==="substancias"?"princípio(s) ativo(s)":"produto(s)"} cobre(m) <b>todos os ${n} sintomas</b>; os demais cobrem parte deles.</div>`
+      : `<div class="sub">Nenhum${aba==="substancias"?" princípio ativo":" produto"} cadastrado cobre todos os ${n} sintomas juntos — mostrando os que cobrem parte deles. Vários sintomas ao mesmo tempo podem pedir avaliação médica.</div>`;
+  }else msg=`<div class="sub">${nf(cntA[aba])} ${aba==="substancias"?"princípios ativos":"produtos"} relacionados.</div>`;
+  return `<div class="page"><h1 class="title">Medicamentos para ${esc(names.join(" + ").toLowerCase())}</h1>${builder}
+    ${msg}<div class="tabs">${tab("substancias","Princípios ativos")}${tab("produtos","Produtos")}</div>${filt}
+    ${arr.length?`<div class="list">${rows}</div>${pager(arr.length,page,p=>href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo,p}))}`:emptyMsg("")}
+    ${noteBox()}</div>`;
+}
+function symNames(params){
+  const out=[]; (params.get("s")||"").split("|").forEach(x=>{ const e=PAT_MAP.get(norm(x)); if(e&&!out.includes(e.nome)) out.push(e.nome); });
+  return out;
+}
+
 function viewDetail(id){
   const p=BY_ID.get(id);
   if(!p) return `<div class="page">${backBtn()}<div class="empty">Medicamento não encontrado — a base pode ter sido atualizada.<br><a href="#/">Buscar novamente</a></div></div>`;
@@ -490,6 +620,12 @@ function viewDetail(id){
   const subs=p._subs.map(s=>{const e=SUB_MAP.get(norm(s)); return e?`<a href="${hList("substancia",e.nome)}">${esc(cap(s))}</a>`:esc(cap(s));});
   const pats=(p.sintomas||[]).map(s=>{const e=PAT_MAP.get(norm(s)); return e?`<a href="${hList("patologia",e.nome)}">${esc(cap(s))}</a>`:""}).join("");
   const labE=p.laboratorio?LAB_MAP.get(norm(p.laboratorio)):null;
+  const groups=infoFor(p);
+  const multi=groups.length>1;
+  const lab=g=>multi?`<div class="who">${esc(g.subs.join(", "))}</div>`:"";
+  const usoBlk = p.uso ? `<p>${esc(p.uso)}</p>` : groups.map(x=>lab(x)+`<p>${esc(x.g.uso)}</p>`).join("");
+  const efBlk = groups.map(x=>lab(x)+ul(x.g.efeitos||[])).join("");
+  const cuBlk = groups.map(x=>lab(x)+ul(x.g.cuidados||[])).join("");
   let related=[];
   if(p._subs.length){ const e=SUB_MAP.get(norm(p._subs[0])); if(e) related=e.prods.filter(x=>x!==p).slice(0,8); }
   return `<div class="page">${backBtn()}
@@ -503,10 +639,14 @@ function viewDetail(id){
         ${p.classe?`<div><dt>Classe terapêutica</dt><dd>${esc(p.classe)}</dd></div>`:""}
         ${p.cat?`<div><dt>Categoria</dt><dd>${esc(p.cat)}</dd></div>`:""}
       </dl>
-      ${p.uso?`<div class="blk"><h2>Para que serve</h2><p>${esc(p.uso)}</p></div>`:""}
+      ${usoBlk?`<div class="blk"><h2>Para que serve</h2>${usoBlk}</div>`:""}
+      ${pats?`<div class="blk"><h2>Sintomas / patologias relacionados</h2><div class="links">${pats}</div></div>`:""}
+      ${efBlk?`<div class="blk"><h2>Efeitos colaterais possíveis</h2>${efBlk}</div>`:""}
+      ${cuBlk?`<div class="blk"><h2>Cuidados e quando evitar</h2>${cuBlk}</div>`:""}
       ${p.posologia?`<div class="blk"><h2>Posologia</h2><p>${esc(p.posologia)}</p></div>`:""}
       ${p.alerta&&p.alerta!=="—"?`<div class="alert"><b>⚠️ Atenção:</b> ${esc(p.alerta)}</div>`:""}
-      ${pats?`<div class="blk"><h2>Patologias / sintomas relacionados</h2><div class="links">${pats}</div></div>`:""}
+      ${groups.length?"":`<div class="blk"><p class="muted">Ainda não temos resumo de uso e efeitos colaterais para este princípio ativo. Consulte a bula do produto.</p></div>`}
+      ${groups.length?`<div class="alert info">Informações gerais sobre o princípio ativo, em linguagem simples. Nem todo efeito listado acontece com todo mundo, e a lista não é completa: leia a <b>bula do produto</b> e fale com seu médico ou farmacêutico.</div>`:""}
     </article>
     ${related.length?`<section class="sec"><h3>Mais produtos com ${esc(cap(p._subs[0]))}</h3><div class="list">${related.map(r=>prodItem(r,"")).join("")}</div></section>`:""}
     ${noteBox()}</div>`;
