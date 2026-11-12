@@ -40,7 +40,7 @@
   svg{flex-shrink:0}
 
   /* ---------- topo ---------- */
-  .topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
+  .topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
   .topbar .in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
   .logo{display:flex;align-items:center;gap:9px;color:var(--ink);font-weight:800;font-size:17px;letter-spacing:-.2px;white-space:nowrap}
   .logo:hover{text-decoration:none}
@@ -94,7 +94,7 @@
   .hero{background:radial-gradient(900px 300px at 85% -10%,rgba(255,255,255,.16),transparent 60%),
         radial-gradient(500px 260px at 0% 110%,rgba(20,184,166,.35),transparent 60%),
         linear-gradient(135deg,var(--hero1),var(--hero2));
-        color:#fff;padding:48px 16px 64px;text-align:center;min-height:calc(100vh - 60px);display:flex;flex-direction:column;justify-content:center;align-items:center}
+        color:#fff;padding:48px 16px 64px;text-align:center;min-height:calc(100vh - 60px - env(safe-area-inset-top));display:flex;flex-direction:column;justify-content:center;align-items:center}
   .hero .sbox{width:100%}
   .explore{margin-top:22px;font-size:13px;opacity:.85}
   .explore a{color:#fff;text-decoration:underline;text-underline-offset:3px}
