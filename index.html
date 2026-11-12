@@ -5,105 +5,206 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BulaLivre — Consulta de Medicamentos</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2b6fd1">
+<meta name="theme-color" content="#0f766e">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BulaLivre">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
   :root{
-    --bg:#0f1115; --panel:#171a21; --panel2:#1e232c; --line:#2a303b;
-    --txt:#e7ebf0; --muted:#9aa4b2; --accent:#4f9dff; --accent2:#2b6fd1;
-    --ok:#39b67a; --warn:#e0a53b; --danger:#e06060; --chip:#232a34;
+    --bg:#f4f7f6; --surface:#fff; --surface2:#eef3f1; --line:#dbe5e1;
+    --ink:#0f2420; --muted:#5a6b66; --brand:#0f766e; --brand2:#115e59; --brand-soft:#d7f0ec;
+    --hero1:#0f766e; --hero2:#134e4a;
+    --ok:#15803d; --ok-bg:#dcf5e4; --warn:#a16207; --warn-bg:#fdf0cc; --danger:#b91c1c; --danger-bg:#fde2e2;
+    --shadow:0 1px 2px rgba(15,36,32,.06),0 4px 14px rgba(15,36,32,.06);
+    --r:14px;
   }
-  @media (prefers-color-scheme: light){
+  @media (prefers-color-scheme: dark){
     :root{
-      --bg:#f4f6f9; --panel:#fff; --panel2:#f0f3f7; --line:#dde3ec;
-      --txt:#1b2430; --muted:#5e6b7b; --accent:#2b6fd1; --accent2:#1d5bb5;
-      --ok:#1f8f5a; --warn:#b5801d; --danger:#c23b3b; --chip:#eaeef4;
+      --bg:#0c1311; --surface:#131d1a; --surface2:#1a2724; --line:#25342f;
+      --ink:#e6f0ed; --muted:#8fa39d; --brand:#2dd4bf; --brand2:#5eead4; --brand-soft:#12332f;
+      --hero1:#0f766e; --hero2:#0b3b38;
+      --ok:#4ade80; --ok-bg:#12301e; --warn:#fbbf24; --warn-bg:#35290a; --danger:#f87171; --danger-bg:#3a1515;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.25);
     }
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    background:var(--bg);color:var(--txt);line-height:1.45}
-  header{position:sticky;top:0;z-index:20;background:var(--panel);
-    border-bottom:1px solid var(--line);padding:12px 16px}
-  .wrap{max-width:900px;margin:0 auto}
-  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  h1{font-size:18px;margin:0;display:flex;align-items:center;gap:8px}
-  .meta{color:var(--muted);font-size:11.5px;margin-top:3px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap}
-  button{font-family:inherit;font-size:13px;padding:8px 12px;border-radius:9px;
-    border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer}
-  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-  button:disabled{opacity:.5;cursor:not-allowed}
-  .search{display:flex;gap:8px;margin-top:12px}
-  #q{flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
-    background:var(--panel2);color:var(--txt);font-size:16px;outline:none}
-  #q:focus{border-color:var(--accent)}
-  .filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-  .chip{padding:5px 11px;border-radius:999px;border:1px solid var(--line);
-    background:var(--chip);color:var(--muted);font-size:12.5px;cursor:pointer;user-select:none}
-  .chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
-  main{max-width:900px;margin:0 auto;padding:16px}
-  .count{color:var(--muted);font-size:13px;margin:4px 2px 12px}
-  .note{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--warn);
-    border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--muted);margin-bottom:14px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
-    padding:14px 16px;margin-bottom:12px}
-  .card h2{margin:0;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .pa{color:var(--muted);font-weight:400;font-size:13px;margin-top:2px}
-  .tag{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
-  .t-mip{background:rgba(57,182,122,.15);color:var(--ok)}
-  .t-presc{background:rgba(224,165,59,.15);color:var(--warn)}
-  .t-ctrl{background:rgba(224,96,96,.15);color:var(--danger)}
-  .t-na{background:var(--chip);color:var(--muted)}
-  .row{display:flex;gap:8px;margin-top:8px;font-size:13.5px}
-  .row .k{color:var(--muted);min-width:96px;flex-shrink:0}
-  .lab{font-size:12px;color:var(--muted);margin-top:6px}
-  .inds{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-  .ind{font-size:11.5px;background:var(--panel2);border:1px solid var(--line);
-    padding:2px 8px;border-radius:6px;color:var(--muted)}
-  mark{background:var(--accent);color:#fff;border-radius:3px;padding:0 2px}
-  .empty{text-align:center;color:var(--muted);padding:40px 10px}
-  .more{text-align:center;margin:6px 0 20px}
-  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
-    background:var(--accent2);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;
-    opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90%}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  button{font-family:inherit;cursor:pointer}
+  svg{flex-shrink:0}
+
+  /* ---------- topo ---------- */
+  .topbar{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
+  .topbar .in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+  .logo{display:flex;align-items:center;gap:9px;color:var(--ink);font-weight:800;font-size:17px;letter-spacing:-.2px;white-space:nowrap}
+  .logo:hover{text-decoration:none}
+  .logo .mk{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--hero1),#14b8a6);display:grid;place-items:center;color:#fff}
+  .logo b{color:var(--brand)}
+  .topsearch{flex:1;min-width:0;max-width:440px;margin-left:auto}
+  .topbtns{display:flex;gap:6px}
+  .ibtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center}
+  .ibtn:hover{color:var(--brand);border-color:var(--brand)}
+  .ibtn:disabled{opacity:.5;cursor:wait}
+  body.home .topsearch{display:none}
+  body.home .topbtns{margin-left:auto}
+
+  /* ---------- campo de busca ---------- */
+  .sbox{position:relative}
+  .sfield{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1.5px solid transparent;border-radius:12px;padding:0 6px 0 12px;height:44px;color:var(--muted)}
+  .sfield:focus-within{border-color:var(--brand);background:var(--surface)}
+  .sfield input{flex:1;min-width:0;border:0;background:transparent;outline:none;font:inherit;font-size:16px;color:var(--ink);height:100%}
+  .sfield input::placeholder{color:var(--muted)}
+  .sfield input::-webkit-search-cancel-button{display:none}
+  .sgo{border:0;background:var(--brand);color:#fff;font-weight:600;font-size:14px;border-radius:9px;padding:0 16px;height:34px}
+  .sgo:hover{background:var(--brand2)}
+  .sug{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);z-index:40;max-height:70vh;overflow:auto;display:none;text-align:left}
+  .sug.open{display:block}
+  .sug h6{margin:0;padding:10px 14px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+  .sug a{display:flex;justify-content:space-between;gap:10px;padding:8px 14px;color:var(--ink);font-size:14.5px}
+  .sug a:hover,.sug a.sel{background:var(--brand-soft);text-decoration:none}
+  .sug a small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+  .sug .all{border-top:1px solid var(--line);color:var(--brand);font-weight:600;justify-content:center;margin-top:4px}
+
+  /* ---------- layout ---------- */
+  main{flex:1;width:100%;max-width:960px;margin:0 auto;padding:20px 16px 8px}
+  body.home main{max-width:none;padding:0}
+  .page{max-width:960px;margin:0 auto}
+
+  /* ---------- home ---------- */
+  .hero{background:radial-gradient(900px 300px at 85% -10%,rgba(255,255,255,.16),transparent 60%),
+        radial-gradient(500px 260px at 0% 110%,rgba(20,184,166,.35),transparent 60%),
+        linear-gradient(135deg,var(--hero1),var(--hero2));
+        color:#fff;padding:54px 16px 90px;text-align:center}
+  .hero h1{margin:0 0 8px;font-size:clamp(28px,6vw,44px);letter-spacing:-1px;line-height:1.1}
+  .hero p{margin:0 auto 26px;max-width:520px;opacity:.9;font-size:clamp(14px,3.4vw,17px)}
+  .hero .sbox{max-width:620px;margin:0 auto}
+  .hero .sfield{background:#fff;height:54px;border-radius:16px;padding-left:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);color:#5a6b66}
+  .hero .sfield input{color:#0f2420}
+  .hero .sgo{height:42px;padding:0 20px;border-radius:12px}
+  .quick{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px auto 0;max-width:640px;align-items:center}
+  .quick span{font-size:13px;opacity:.8}
+  .quick a{color:#fff;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:5px 12px;border-radius:999px;font-size:13px}
+  .quick a:hover{background:rgba(255,255,255,.28);text-decoration:none}
+  .stats{max-width:820px;margin:-52px auto 0;padding:0 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative}
+  .stat{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 8px;text-align:center;color:var(--ink);border:1px solid var(--line)}
+  .stat:hover{text-decoration:none;border-color:var(--brand);transform:translateY(-1px)}
+  .stat b{display:block;font-size:clamp(20px,4.6vw,30px);color:var(--brand);letter-spacing:-.5px;line-height:1.15}
+  .stat span{font-size:12.5px;color:var(--muted)}
+  .homebody{max-width:820px;margin:26px auto 0;padding:0 16px}
+  .about{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--muted);font-size:14px}
+  .about h2{margin:0 0 6px;font-size:16px;color:var(--ink)}
+  .about p{margin:0 0 8px}
+  .about p:last-child{margin:0}
+
+  /* ---------- resultados ---------- */
+  h1.title{font-size:clamp(20px,4.5vw,26px);margin:2px 0 4px;letter-spacing:-.4px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{white-space:nowrap;padding:7px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);font-size:13.5px;font-weight:500}
+  .tab:hover{text-decoration:none;border-color:var(--brand);color:var(--brand)}
+  .tab.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .tab i{font-style:normal;opacity:.75;margin-left:4px;font-size:12px}
+  .filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;align-items:center}
+  .filters>span{font-size:12.5px;color:var(--muted);margin-right:2px}
+  .chip{padding:4px 11px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:12.5px}
+  .chip:hover{text-decoration:none;border-color:var(--brand);color:var(--brand)}
+  .chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+  .sec{margin:0 0 22px}
+  .sec h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);display:flex;justify-content:space-between;align-items:baseline}
+  .sec h3 a{text-transform:none;letter-spacing:0;font-size:13px;font-weight:600}
+  .list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+  .item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);color:var(--ink)}
+  .item:first-child{border-top:0}
+  .item:hover{background:var(--brand-soft);text-decoration:none}
+  .ico{width:36px;height:36px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex-shrink:0}
+  .item .tx{flex:1;min-width:0}
+  .item .nm{font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis}
+  .item .sb{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .go{color:var(--muted);flex-shrink:0}
+  mark{background:#fde68a;color:#3b2f00;border-radius:3px;padding:0 1px}
+  .tag{font-size:11px;padding:2px 9px;border-radius:999px;font-weight:700;white-space:nowrap;flex-shrink:0}
+  .t-mip{background:var(--ok-bg);color:var(--ok)}
+  .t-presc{background:var(--warn-bg);color:var(--warn)}
+  .t-ctrl{background:var(--danger-bg);color:var(--danger)}
+  .t-na{background:var(--surface2);color:var(--muted)}
+  .pager{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:18px 0 8px}
+  .pager a,.pager span{min-width:38px;height:38px;padding:0 10px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px}
+  .pager a:hover{text-decoration:none;border-color:var(--brand);color:var(--brand)}
+  .pager .cur{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+  .pager .dis{opacity:.4}
+  .pager .dots{border:0;background:transparent}
+  .empty{text-align:center;color:var(--muted);padding:48px 10px}
+  .empty b{color:var(--ink)}
+
+  /* ---------- detalhe ---------- */
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;margin-bottom:12px;background:none;border:0;padding:4px 0}
+  .back:hover{color:var(--brand)}
+  .dcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+  .dhead{display:flex;gap:14px;align-items:flex-start}
+  .dhead .ico{width:52px;height:52px;border-radius:14px}
+  .dhead h1{margin:0;font-size:clamp(22px,5vw,30px);letter-spacing:-.6px;line-height:1.15;word-break:break-word}
+  .dhead .lab{margin-top:4px;font-size:15px}
+  .dhead .tag{margin-top:8px;display:inline-block}
+  .dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px 24px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .dl dt{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 3px}
+  .dl dd{margin:0;font-size:15px}
+  .blk{margin-top:18px}
+  .blk h2{margin:0 0 6px;font-size:16px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .blk p{margin:6px 0 0;font-size:15px}
+  .alert{background:var(--warn-bg);color:var(--ink);border-left:4px solid var(--warn);border-radius:10px;padding:12px 14px;margin-top:18px;font-size:14.5px}
+  .alert b{color:var(--warn)}
+  .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .links a{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--brand-soft);color:var(--brand);font-size:13.5px;font-weight:500}
+  .links a:hover{text-decoration:none;background:var(--brand);color:#fff}
+  .note{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--muted);margin:18px 0}
+  .tip{border-left-color:var(--brand);display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+  .tip button{border:0;background:none;color:var(--brand);font-size:12.5px;white-space:nowrap;padding:0}
+
+  footer{max-width:960px;width:100%;margin:0 auto;padding:14px 16px 34px;color:var(--muted);font-size:12px;text-align:center}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
+    padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90%}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  footer{max-width:900px;margin:0 auto;padding:10px 16px 40px;color:var(--muted);font-size:11.5px}
+  .loading{text-align:center;color:var(--muted);padding:60px 0}
+
+  @media (max-width:560px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .hero{padding:40px 16px 80px}
+    .stats{margin-top:-46px}
+    .logo span.t{display:none}
+    body:not(.home) .logo span.t{display:none}
+    .sgo{padding:0 12px}
+    .item .tag{display:none}
+    .dcard{padding:16px}
+  }
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <div class="top">
-      <div>
-        <h1>💊 BulaLivre</h1>
-        <div class="meta" id="meta">carregando base…</div>
-      </div>
-      <div class="actions">
-        <button id="btnUpdate" title="Recarrega a base de dados mais recente publicada">↻ Atualizar</button>
-        <button id="btnDownload" class="primary" title="Baixa uma cópia completa que funciona sem internet">⤓ Baixar offline</button>
-      </div>
+<header class="topbar">
+  <div class="in">
+    <a class="logo" href="#/" aria-label="BulaLivre — início">
+      <span class="mk"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg></span>
+      <span class="t">Bula<b>Livre</b></span>
+    </a>
+    <div class="topsearch sbox" id="topSearch"></div>
+    <div class="topbtns">
+      <button class="ibtn" id="btnUpdate" title="Recarrega a base de dados mais recente publicada" aria-label="Atualizar base">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/><path d="M3 12A9 9 0 0 1 18.5 5.8L21 8"/><path d="M21 3v5h-5"/></svg>
+      </button>
+      <button class="ibtn" id="btnDownload" title="Baixa uma cópia completa que funciona sem internet" aria-label="Baixar cópia offline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+      </button>
     </div>
-    <div class="search">
-      <input id="q" type="search" placeholder='Busque sintoma ("dor de cabeça"), remédio ("dipirona") ou laboratório' autofocus>
-    </div>
-    <div class="filters" id="filters"></div>
   </div>
 </header>
-<main>
-  <div class="note">
-    ⚕️ Material de <b>referência</b> — não substitui a bula nem a orientação de médico/farmacêutico.
-    Fonte dos dados: <b>Bulário Eletrônico / Dados Abertos da ANVISA</b>.
-  </div>
-  <div class="count" id="count"></div>
-  <div id="results"></div>
-  <div class="more" id="more"></div>
-</main>
+<main id="app"><div class="loading">carregando base…</div></main>
 <footer id="footer"></footer>
 <div id="toast"></div>
 
@@ -116,137 +217,345 @@ let EMBEDDED_DATA = null; /*__EMBED_SLOT__*/
 
 const OFFLINE = EMBEDDED_DATA !== null;
 let DATA = {versao:"—", atualizado_em:"", fonte:"", total:0, produtos:[]};
-let LIMIT = 200;
+const PAGE = 20;
 
+/* ---------- utilidades ---------- */
 const norm = s => (s||"").toString().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
-const TIPO = {mip:["Isento de prescrição","t-mip"], presc:["Sob prescrição","t-presc"],
-              ctrl:["Controlado","t-ctrl"], "":["—","t-na"]};
-
+const esc = s => (s||"").toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $ = id => document.getElementById(id);
-const elQ=$("q"), elRes=$("results"), elCount=$("count"), elMore=$("more"),
-      elFilters=$("filters"), elMeta=$("meta"), elFooter=$("footer");
+const nf = n => n.toLocaleString("pt-BR");
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
+const slug = s => norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const TIPO = {mip:["Isento de prescrição","t-mip"], presc:["Sob prescrição","t-presc"], ctrl:["Controlado","t-ctrl"], "":["Não informado","t-na"]};
+const ICON = {
+  pill:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7Z"/><path d="m8.5 8.5 7 7"/></svg>',
+  flask:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9V3"/></svg>',
+  building:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 21v-5h6v5"/></svg>',
+  heart:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 8L9 4l-3 8H2"/></svg>',
+  search:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>',
+  chev:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+  back:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>'
+};
 
-let activeTipo = null;
+function hl(text,q){
+  const t=text||"";
+  const nq=norm(q);
+  if(!nq) return esc(t);
+  const nt=norm(t), i=nt.indexOf(nq);
+  if(i<0 || nt.length!==t.length) return esc(t);
+  return esc(t.slice(0,i))+"<mark>"+esc(t.slice(i,i+nq.length))+"</mark>"+esc(t.slice(i+nq.length));
+}
 
+/* ---------- índices (produtos, substâncias, laboratórios, patologias) ---------- */
+let PRODS=[], SUBS=[], LABS=[], PATS=[], BY_ID=new Map(), SUB_MAP=new Map(), LAB_MAP=new Map(), PAT_MAP=new Map();
+
+function buildIndex(){
+  PRODS = DATA.produtos||[];
+  BY_ID.clear(); SUB_MAP.clear(); LAB_MAP.clear(); PAT_MAP.clear();
+  const add=(map,name,p)=>{
+    const k=norm(name); if(!k) return;
+    let e=map.get(k); if(!e){ e={nome:cap(name.trim()),k,_h:k,prods:[]}; map.set(k,e); }
+    e.prods.push(p);
+  };
+  PRODS.forEach(p=>{
+    p._h = norm([p.nome,p.pa,p.laboratorio,p.classe,p.cat,(p.sintomas||[]).join(" ")].join(" | "));
+    p._n = norm(p.nome);
+    let id = slug(p.nome)+(p.laboratorio?"--"+slug(p.laboratorio).slice(0,24):"");
+    if(BY_ID.has(id)){ let i=2; while(BY_ID.has(id+"-"+i)) i++; id+="-"+i; }
+    p.id=id; BY_ID.set(id,p);
+    p._subs = (p.pa||"").split(/\s*,\s*/).filter(Boolean);
+    p._subs.forEach(s=>add(SUB_MAP,s,p));
+    if(p.laboratorio) add(LAB_MAP,p.laboratorio,p);
+    (p.sintomas||[]).forEach(s=>add(PAT_MAP,s,p));
+  });
+  const fin=m=>[...m.values()].sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0);
+  SUBS=fin(SUB_MAP); LABS=fin(LAB_MAP); PATS=fin(PAT_MAP);
+}
+
+function rank(list,q,key){
+  // prefixo > contém; depois ordem alfabética
+  const nq=norm(q);
+  if(!nq) return list;
+  return list.map(x=>{const n=key(x);return [n.startsWith(nq)?0:(n.split(/\s+/).some(w=>w.startsWith(nq))?1:2),x];})
+             .sort((a,b)=>a[0]-b[0]||(key(a[1])<key(b[1])?-1:key(a[1])>key(b[1])?1:0)).map(x=>x[1]);
+}
+function searchProds(q,tipo){
+  const words=norm(q).split(/\s+/).filter(Boolean);
+  const list=PRODS.filter(p=>(!tipo||p.tipo===tipo) && words.every(w=>p._h.includes(w)));
+  return rank(list,q,p=>p._n);
+}
+function searchAgg(arr,q){
+  const words=norm(q).split(/\s+/).filter(Boolean);
+  const list=arr.filter(e=>words.every(w=>e.k.includes(w)));
+  return rank(list,q,e=>e.k);
+}
+
+/* ---------- roteador por hash ---------- */
+function parseHash(){
+  let h=location.hash.replace(/^#/,"")||"/";
+  const [path,qs]=h.split("?");
+  return {parts:path.split("/").filter(Boolean).map(decodeURIComponent), params:new URLSearchParams(qs||"")};
+}
+function href(path,params){
+  const qs=new URLSearchParams();
+  Object.entries(params||{}).forEach(([k,v])=>{ if(v!==undefined&&v!==null&&v!=="") qs.set(k,v); });
+  const s=qs.toString();
+  return "#/"+path+(s?"?"+s:"");
+}
+const hMed = p => "#/medicamento/"+encodeURIComponent(p.id);
+const hList = (kind,name) => "#/lista/"+kind+"/"+encodeURIComponent(name);
+
+let lastQ="";
+function route(){
+  const {parts,params}=parseHash();
+  const app=$("app");
+  const view=parts[0]||"";
+  document.body.classList.toggle("home",view==="");
+  window.scrollTo(0,0);
+  if(!PRODS.length && !DATA.produtos.length){ return; }
+  if(view===""){ app.innerHTML=viewHome(); document.title="BulaLivre — Consulta de Medicamentos"; }
+  else if(view==="busca"){ app.innerHTML=viewSearch(params); }
+  else if(view==="medicamento"){ app.innerHTML=viewDetail(parts[1]||""); }
+  else if(view==="lista"){ app.innerHTML=viewList(parts[1],parts.slice(2).join("/"),params); }
+  else { location.hash="#/"; return; }
+  const q = view==="busca" ? (params.get("q")||"") : "";
+  lastQ=q;
+  mountSearch($("topSearch"),q,"Buscar medicamento, princípio ativo, sintoma…");
+  const hs=$("heroSearch"); if(hs) mountSearch(hs,"","Digite o medicamento, princípio ativo, sintoma ou laboratório",true);
+  const dm=$("dismissTip"); if(dm) dm.onclick=()=>{try{localStorage.setItem("bl_dismiss_install","1");}catch(e){} $("tip").remove();};
+}
+window.addEventListener("hashchange",route);
+
+/* ---------- busca com sugestões ---------- */
+function mountSearch(box,val,ph,hero){
+  box.innerHTML=`<form class="sfield" role="search" autocomplete="off">${ICON.search}
+    <input type="search" enterkeyhint="search" placeholder="${esc(ph)}" value="${esc(val)}" aria-label="Buscar">
+    ${hero?'<button class="sgo" type="submit">Buscar</button>':''}</form><div class="sug"></div>`;
+  const form=box.querySelector("form"), inp=box.querySelector("input"), sug=box.querySelector(".sug");
+  let sel=-1, tm;
+  const go=()=>{ sug.classList.remove("open"); const q=inp.value.trim(); location.hash=href("busca",{q}); inp.blur(); };
+  form.onsubmit=e=>{e.preventDefault(); const cur=sug.querySelector("a.sel"); if(cur) {sug.classList.remove("open"); location.hash=cur.getAttribute("href");} else go();};
+  const draw=()=>{
+    const q=inp.value.trim(); sel=-1;
+    if(norm(q).length<2){ sug.classList.remove("open"); return; }
+    const P=searchProds(q).slice(0,5), S=searchAgg(SUBS,q).slice(0,3), L=searchAgg(LABS,q).slice(0,2), T=searchAgg(PATS,q).slice(0,3);
+    let h="";
+    if(P.length) h+="<h6>Medicamentos</h6>"+P.map(p=>`<a href="${hMed(p)}"><span>${hl(p.nome,q)}</span><small>${esc(p.laboratorio)}</small></a>`).join("");
+    if(S.length) h+="<h6>Princípios ativos</h6>"+S.map(e=>`<a href="${hList("substancia",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
+    if(T.length) h+="<h6>Patologias / sintomas</h6>"+T.map(e=>`<a href="${hList("patologia",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
+    if(L.length) h+="<h6>Laboratórios</h6>"+L.map(e=>`<a href="${hList("laboratorio",e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
+    h+=`<a class="all" href="${href("busca",{q})}">Ver todos os resultados para “${esc(q)}”</a>`;
+    sug.innerHTML=h; sug.classList.add("open");
+  };
+  inp.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(draw,120);});
+  inp.addEventListener("focus",()=>{ if(inp.value.trim().length>=2) draw(); });
+  inp.addEventListener("keydown",e=>{
+    const items=[...sug.querySelectorAll("a")];
+    if(e.key==="Escape"){ sug.classList.remove("open"); return; }
+    if(!sug.classList.contains("open")||!items.length) return;
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+      e.preventDefault();
+      sel += e.key==="ArrowDown" ? 1 : -1;
+      if(sel>=items.length) sel=-1; else if(sel<-1) sel=items.length-1;
+      items.forEach((a,i)=>a.classList.toggle("sel",i===sel));
+      if(items[sel]) items[sel].scrollIntoView({block:"nearest"});
+    }
+  });
+  sug.addEventListener("click",()=>sug.classList.remove("open"));
+}
+document.addEventListener("click",e=>{ document.querySelectorAll(".sug.open").forEach(s=>{ if(!s.parentElement.contains(e.target)) s.classList.remove("open"); }); });
+
+/* ---------- componentes ---------- */
+function tagOf(p){ const [l,c]=TIPO[p.tipo||""]||TIPO[""]; return `<span class="tag ${c}">${l}</span>`; }
+function prodItem(p,q){
+  const sub=[p.laboratorio,p.pa].filter(Boolean).join(" · ");
+  return `<a class="item" href="${hMed(p)}"><span class="ico">${ICON.pill}</span>
+    <span class="tx"><div class="nm">${hl(p.nome,q)}</div><div class="sb">${hl(sub,q)}</div></span>
+    ${p.tipo?tagOf(p):""}<span class="go">${ICON.chev}</span></a>`;
+}
+function aggItem(e,kind,q){
+  const ic={substancia:ICON.flask,laboratorio:ICON.building,patologia:ICON.heart}[kind];
+  return `<a class="item" href="${hList(kind,e.nome)}"><span class="ico">${ic}</span>
+    <span class="tx"><div class="nm">${hl(e.nome,q)}</div><div class="sb">${nf(e.prods.length)} produto${e.prods.length===1?"":"s"}</div></span><span class="go">${ICON.chev}</span></a>`;
+}
+function pager(total,page,mk){
+  const pages=Math.ceil(total/PAGE); if(pages<=1) return "";
+  const set=new Set([1,pages,page,page-1,page+1,page-2,page+2].filter(n=>n>=1&&n<=pages));
+  const arr=[...set].sort((a,b)=>a-b);
+  let h='<nav class="pager" aria-label="Paginação">';
+  h+= page>1?`<a href="${mk(page-1)}" aria-label="Anterior">‹</a>`:`<span class="dis">‹</span>`;
+  let prev=0;
+  arr.forEach(n=>{ if(n-prev>1) h+='<span class="dots">…</span>'; h+= n===page?`<span class="cur">${n}</span>`:`<a href="${mk(n)}">${n}</a>`; prev=n; });
+  h+= page<pages?`<a href="${mk(page+1)}" aria-label="Próxima">›</a>`:`<span class="dis">›</span>`;
+  return h+"</nav>";
+}
+function noteBox(){ return `<div class="note">⚕️ Material de <b>referência</b> — não substitui a bula nem a orientação de médico/farmacêutico.</div>`; }
+
+/* ---------- views ---------- */
+function topSymptoms(n){
+  return [...PATS].sort((a,b)=>b.prods.length-a.prods.length).slice(0,n);
+}
+function viewHome(){
+  const quick=topSymptoms(6).map(e=>`<a href="${hList("patologia",e.nome)}">${esc(e.nome)}</a>`).join("");
+  let tip="";
+  try{
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    if(!standalone && !OFFLINE && localStorage.getItem("bl_dismiss_install")!=="1"){
+      const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+      tip=`<div class="note tip" id="tip"><span>📲 <b>Instalar como app:</b> ${ios
+        ? 'toque em <b>Compartilhar</b> e depois em <b>Adicionar à Tela de Início</b>.'
+        : 'no menu do navegador, escolha <b>Instalar app</b> / <b>Adicionar à tela inicial</b>.'} Funciona offline.</span>
+        <button id="dismissTip">dispensar</button></div>`;
+    }
+  }catch(e){}
+  return `<section class="hero">
+      <h1>Consulta de medicamentos</h1>
+      <p>Pesquise por medicamento, princípio ativo, patologia ou laboratório — base aberta da ANVISA.</p>
+      <div class="sbox" id="heroSearch"></div>
+      ${quick?`<div class="quick"><span>Mais buscados:</span>${quick}</div>`:""}
+    </section>
+    <div class="stats">
+      <a class="stat" href="${href("busca",{aba:"produtos"})}"><b>${nf(PRODS.length)}</b><span>Produtos</span></a>
+      <a class="stat" href="${href("busca",{aba:"substancias"})}"><b>${nf(SUBS.length)}</b><span>Princípios ativos</span></a>
+      <a class="stat" href="${href("busca",{aba:"laboratorios"})}"><b>${nf(LABS.length)}</b><span>Laboratórios</span></a>
+      <a class="stat" href="${href("busca",{aba:"patologias"})}"><b>${nf(PATS.length)}</b><span>Patologias</span></a>
+    </div>
+    <div class="homebody">${tip}
+      <div class="about"><h2>Sobre o BulaLivre</h2>
+        <p>Reúne informações de produtos farmacêuticos registrados no Brasil, a partir dos <b>Dados Abertos da ANVISA</b>, para consulta rápida por nome, substância, laboratório ou sintoma.</p>
+        <p>Este conteúdo é um <b>complemento</b> e não substitui a bula, a receita ou a orientação de um médico ou farmacêutico.</p></div>
+    </div>`;
+}
+
+const ABAS=[["todos","Todos"],["produtos","Produtos"],["substancias","Substâncias"],["patologias","Patologias"],["laboratorios","Laboratórios"]];
+function viewSearch(params){
+  const q=(params.get("q")||"").trim();
+  let aba=params.get("aba")||"todos";
+  if(!ABAS.some(a=>a[0]===aba)) aba="todos";
+  if(!q && aba==="todos") aba="produtos";
+  const tipo=params.get("tipo")||"";
+  const page=Math.max(1,parseInt(params.get("p"))||1);
+  const P=searchProds(q,aba==="produtos"?tipo:""), S=searchAgg(SUBS,q), L=searchAgg(LABS,q), T=searchAgg(PATS,q);
+  const cnt={todos:P.length+S.length+L.length+T.length,produtos:P.length,substancias:S.length,patologias:T.length,laboratorios:L.length};
+  if(aba==="produtos" && tipo){ cnt.produtos=searchProds(q).length; }
+  document.title=(q?q+" — ":"")+"Resultados · BulaLivre";
+  const tabs=`<div class="tabs" role="tablist">${ABAS.filter(a=>a[0]==="todos"?!!q:true).map(([k,l])=>
+    `<a class="tab${k===aba?" on":""}" href="${href("busca",{q,aba:k==="todos"?"":k})}">${l}<i>${nf(cnt[k])}</i></a>`).join("")}</div>`;
+  let body="";
+  if(aba==="todos"){
+    if(!cnt.todos) body=emptyMsg(q);
+    else{
+      const sec=(title,arr,aby,fn)=>arr.length?`<section class="sec"><h3>${title}<a href="${href("busca",{q,aba:aby})}">ver todos (${nf(arr.length)})</a></h3><div class="list">${arr.slice(0,5).map(fn).join("")}</div></section>`:"";
+      body=sec("Produtos",P,"produtos",p=>prodItem(p,q))+sec("Princípios ativos",S,"substancias",e=>aggItem(e,"substancia",q))+
+           sec("Patologias / sintomas",T,"patologias",e=>aggItem(e,"patologia",q))+sec("Laboratórios",L,"laboratorios",e=>aggItem(e,"laboratorio",q));
+    }
+  }else{
+    const arr={produtos:P,substancias:S,patologias:T,laboratorios:L}[aba];
+    const kind={substancias:"substancia",patologias:"patologia",laboratorios:"laboratorio"}[aba];
+    const fn= aba==="produtos" ? (p=>prodItem(p,q)) : (e=>aggItem(e,kind,q));
+    const filt = aba==="produtos" ? `<div class="filters"><span>Tipo:</span>${[["","Todos"],["mip","Isento de prescrição"],["presc","Sob prescrição"],["ctrl","Controlado"]].map(([v,l])=>
+      `<a class="chip${tipo===v?" on":""}" href="${href("busca",{q,aba:"produtos",tipo:v})}">${l}</a>`).join("")}</div>` : "";
+    body = filt + (arr.length ? `<div class="list">${arr.slice(PAGE*(page-1),PAGE*page).map(fn).join("")}</div>`+
+      pager(arr.length,page,n=>href("busca",{q,aba,tipo,p:n})) : emptyMsg(q));
+  }
+  return `<div class="page"><h1 class="title">${q?`Resultados para “${esc(q)}”`:"Explorar"}</h1>
+    <div class="sub">${q?"Medicamentos, princípios ativos, patologias e laboratórios.":"Navegue pela base completa."}</div>${tabs}${body}${noteBox()}</div>`;
+}
+function emptyMsg(q){
+  return `<div class="empty">Nada encontrado${q?` para “<b>${esc(q)}</b>”`:""}.<br>Tente um sintoma (<i>febre</i>, <i>azia</i>, <i>cólica</i>), um remédio ou um laboratório.</div>`;
+}
+
+function viewList(kind,name,params){
+  const map={substancia:SUB_MAP,laboratorio:LAB_MAP,patologia:PAT_MAP}[kind];
+  const e=map&&map.get(norm(name));
+  if(!e) return `<div class="page">${backBtn()}<div class="empty">Item não encontrado.<br><a href="#/">Voltar ao início</a></div></div>`;
+  const page=Math.max(1,parseInt(params.get("p"))||1);
+  const label={substancia:"Princípio ativo",laboratorio:"Laboratório",patologia:"Patologia / sintoma"}[kind];
+  const list=[...e.prods].sort((a,b)=>a._n<b._n?-1:a._n>b._n?1:0);
+  document.title=e.nome+" · BulaLivre";
+  const rel = kind==="patologia" ? "" : "";
+  return `<div class="page">${backBtn()}<div class="sub" style="margin:0">${label}</div>
+    <h1 class="title">${esc(e.nome)}</h1><div class="sub">${nf(list.length)} produto${list.length===1?"":"s"}</div>
+    <div class="list">${list.slice(PAGE*(page-1),PAGE*page).map(p=>prodItem(p,"")).join("")}</div>
+    ${pager(list.length,page,n=>href("lista/"+kind+"/"+encodeURIComponent(e.nome),{p:n}))}${rel}${noteBox()}</div>`;
+}
+
+function backBtn(){ return `<button class="back" onclick="history.length>1?history.back():(location.hash='#/')">${ICON.back} Voltar</button>`; }
+
+function viewDetail(id){
+  const p=BY_ID.get(id);
+  if(!p) return `<div class="page">${backBtn()}<div class="empty">Medicamento não encontrado — a base pode ter sido atualizada.<br><a href="#/">Buscar novamente</a></div></div>`;
+  document.title=p.nome+" · BulaLivre";
+  const [tl,tc]=TIPO[p.tipo||""]||TIPO[""];
+  const subs=p._subs.map(s=>{const e=SUB_MAP.get(norm(s)); return e?`<a href="${hList("substancia",e.nome)}">${esc(cap(s))}</a>`:esc(cap(s));});
+  const pats=(p.sintomas||[]).map(s=>{const e=PAT_MAP.get(norm(s)); return e?`<a href="${hList("patologia",e.nome)}">${esc(cap(s))}</a>`:""}).join("");
+  const labE=p.laboratorio?LAB_MAP.get(norm(p.laboratorio)):null;
+  let related=[];
+  if(p._subs.length){ const e=SUB_MAP.get(norm(p._subs[0])); if(e) related=e.prods.filter(x=>x!==p).slice(0,8); }
+  return `<div class="page">${backBtn()}
+    <article class="dcard">
+      <div class="dhead"><span class="ico">${ICON.pill}</span><div>
+        <h1>${esc(p.nome)}</h1>
+        ${labE?`<div class="lab"><a href="${hList("laboratorio",labE.nome)}">${esc(p.laboratorio)}</a></div>`:""}
+        <span class="tag ${tc}">${tl}</span></div></div>
+      <dl class="dl">
+        ${subs.length?`<div><dt>Princípio ativo</dt><dd>${subs.join(", ")}</dd></div>`:""}
+        ${p.classe?`<div><dt>Classe terapêutica</dt><dd>${esc(p.classe)}</dd></div>`:""}
+        ${p.cat?`<div><dt>Categoria</dt><dd>${esc(p.cat)}</dd></div>`:""}
+      </dl>
+      ${p.uso?`<div class="blk"><h2>Para que serve</h2><p>${esc(p.uso)}</p></div>`:""}
+      ${p.posologia?`<div class="blk"><h2>Posologia</h2><p>${esc(p.posologia)}</p></div>`:""}
+      ${p.alerta&&p.alerta!=="—"?`<div class="alert"><b>⚠️ Atenção:</b> ${esc(p.alerta)}</div>`:""}
+      ${pats?`<div class="blk"><h2>Patologias / sintomas relacionados</h2><div class="links">${pats}</div></div>`:""}
+    </article>
+    ${related.length?`<section class="sec"><h3>Mais produtos com ${esc(cap(p._subs[0]))}</h3><div class="list">${related.map(r=>prodItem(r,"")).join("")}</div></section>`:""}
+    ${noteBox()}</div>`;
+}
+
+/* ---------- dados ---------- */
 async function loadData(bustCache){
   if(OFFLINE){ DATA = EMBEDDED_DATA; afterLoad(); return; }
   try{
-    const url = "bulas.json?v=" + Date.now();
-    const r = await fetch(url, {cache: "no-store"});
+    const r = await fetch("bulas.json?v="+Date.now(), {cache:"no-store"});
     if(!r.ok) throw new Error("HTTP "+r.status);
     DATA = await r.json();
     afterLoad();
-    if(bustCache) toast("Base atualizada — versão "+(DATA.versao||"?")+" ("+ (DATA.total||DATA.produtos.length) +" produtos)");
+    if(bustCache) toast("Base atualizada — versão "+(DATA.versao||"?")+" ("+nf(DATA.total||DATA.produtos.length)+" produtos)");
   }catch(e){
-    elMeta.textContent = "Não foi possível carregar bulas.json ("+e.message+").";
-    elRes.innerHTML = '<div class="empty">Não encontrei <b>bulas.json</b> ao lado do index.html.<br>'+
+    $("app").innerHTML='<div class="empty">Não foi possível carregar <b>bulas.json</b> ('+esc(e.message)+').<br>'+
       'No GitHub Pages ele é gerado pelo workflow de atualização.</div>';
   }
 }
-
 function afterLoad(){
-  const prods = DATA.produtos||[];
-  // índice de busca pré-computado
-  prods.forEach(p=>{ p._h = norm([p.nome,p.pa,p.laboratorio,p.classe,p.cat,(p.sintomas||[]).join(" ")].join(" | ")); });
-  DATA.total = DATA.total || prods.length;
+  buildIndex();
+  DATA.total = DATA.total || PRODS.length;
   const d = DATA.atualizado_em ? new Date(DATA.atualizado_em) : null;
   const quando = d && !isNaN(d) ? d.toLocaleDateString("pt-BR") : (DATA.versao||"—");
-  elMeta.innerHTML = (DATA.total.toLocaleString("pt-BR"))+" produtos · versão "+quando +
-                     (OFFLINE ? ' · <b>cópia offline</b>' : '');
-  elFooter.textContent = "Fonte: "+(DATA.fonte||"ANVISA — Dados Abertos")+
-     (OFFLINE ? " · Esta é uma cópia offline; para atualizar, baixe de novo no site." : "");
-  if(OFFLINE){ $("btnUpdate").style.display="none"; }
-  buildFilters();
-  render();
+  $("footer").innerHTML = "Fonte: "+esc(DATA.fonte||"ANVISA — Dados Abertos")+" · base de "+esc(quando)+
+    (OFFLINE ? " · <b>cópia offline</b> (para atualizar, baixe de novo no site)" : "");
+  if(OFFLINE) $("btnUpdate").style.display="none";
+  route();
 }
 
-function buildFilters(){
-  elFilters.innerHTML="";
-  const defs=[["Todos",null],["Isento",["mip"]],["Prescrição",["presc"]],["Controlado",["ctrl"]]];
-  defs.forEach(([label,val])=>{
-    const c=document.createElement("div");
-    c.className="chip"+((JSON.stringify(val)===JSON.stringify(activeTipo))?" active":"");
-    c.textContent=label;
-    c.onclick=()=>{activeTipo=val; LIMIT=200; buildFilters(); render();};
-    elFilters.appendChild(c);
-  });
-}
-
-function hl(text,q){
-  if(!q) return esc(text);
-  const t=esc(text), nt=norm(text), nq=norm(q), i=nt.indexOf(nq);
-  if(i<0||!nq) return t;
-  // mapeia índice normalizado -> original aproximado (comprimentos iguais p/ acentos simples)
-  return t.slice(0,i)+"<mark>"+t.slice(i,i+q.length)+"</mark>"+t.slice(i+q.length);
-}
-function esc(s){return (s||"").toString().replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
-
-function match(p,words){
-  if(!words.length) return true;
-  return words.every(w=>p._h.includes(w));
-}
-
-function render(){
-  const q=elQ.value.trim();
-  const words=norm(q).split(/\s+/).filter(Boolean);
-  let list=(DATA.produtos||[]).filter(p=>{
-    if(activeTipo && !activeTipo.includes(p.tipo||"")) return false;
-    return match(p,words);
-  });
-  const total=list.length;
-  elCount.textContent = total
-    ? `${total.toLocaleString("pt-BR")} resultado(s)${q?` para "${q}"`:""}` : "";
-  if(!total){
-    elRes.innerHTML=`<div class="empty">Nada encontrado${q?` para "<b>${esc(q)}</b>"`:""}.<br>
-      Tente um sintoma (<i>febre</i>, <i>azia</i>, <i>cólica</i>), um remédio ou um laboratório.</div>`;
-    elMore.innerHTML=""; return;
-  }
-  const shown=list.slice(0,LIMIT);
-  elRes.innerHTML=shown.map(p=>card(p,q)).join("");
-  elMore.innerHTML = total>LIMIT
-    ? `<button id="moreBtn">Mostrar mais (${(total-LIMIT).toLocaleString("pt-BR")} restantes)</button>`
-    : "";
-  const mb=$("moreBtn"); if(mb) mb.onclick=()=>{LIMIT+=200; render();};
-}
-
-function card(p,q){
-  const [tl,tc]=TIPO[p.tipo||""]||TIPO[""];
-  const sint=(p.sintomas||[]);
-  return `<div class="card">
-    <h2>${hl(p.nome,q)} <span class="tag ${tc}">${tl}</span></h2>
-    ${p.pa?`<div class="pa">${hl(p.pa,q)}${p.classe?" · "+esc(p.classe):""}</div>`:(p.classe?`<div class="pa">${esc(p.classe)}</div>`:"")}
-    ${p.laboratorio?`<div class="lab">🏭 ${hl(p.laboratorio,q)}</div>`:""}
-    ${p.uso?`<div class="row"><span class="k">Para que serve</span><span>${esc(p.uso)}</span></div>`:""}
-    ${p.posologia?`<div class="row"><span class="k">Posologia</span><span>${esc(p.posologia)}</span></div>`:""}
-    ${p.alerta&&p.alerta!=="—"?`<div class="row"><span class="k">⚠️ Atenção</span><span>${esc(p.alerta)}</span></div>`:""}
-    ${sint.length?`<div class="inds">${sint.map(s=>`<span class="ind">${hl(s,q)}</span>`).join("")}</div>`:""}
-  </div>`;
-}
-
-let tmr; elQ.addEventListener("input",()=>{clearTimeout(tmr);tmr=setTimeout(()=>{LIMIT=200;render();},120);});
-
-$("btnUpdate").onclick=()=>{ $("btnUpdate").disabled=true; $("btnUpdate").textContent="atualizando…";
-  loadData(true).finally(()=>{ $("btnUpdate").disabled=false; $("btnUpdate").textContent="↻ Atualizar"; }); };
-
+$("btnUpdate").onclick=()=>{ const b=$("btnUpdate"); b.disabled=true; loadData(true).finally(()=>{ b.disabled=false; }); };
 $("btnDownload").onclick=downloadOffline;
 async function downloadOffline(){
-  const btn=$("btnDownload"); btn.disabled=true; const old=btn.textContent; btn.textContent="gerando…";
+  const btn=$("btnDownload"); btn.disabled=true;
   try{
     let src;
     try{ src=await (await fetch("index.html",{cache:"no-store"})).text(); }
     catch(e){ src="<!DOCTYPE html>\n"+document.documentElement.outerHTML; }
-    let json=JSON.stringify(DATA).replace(/</g,"\\u003c");
-    src=src.replace(/let EMBEDDED_DATA = [\s\S]*?; \/\*__EMBED_SLOT__\*\//,
-        "let EMBEDDED_DATA = "+json+"; /*__EMBED_SLOT__*/");
+    // remove índices calculados (campos com "_" e id) para o arquivo ficar enxuto
+    const clean=JSON.stringify(DATA,(k,v)=>(k[0]==="_"||k==="id")?undefined:v).replace(/</g,"\\u003c");
+    src=src.replace(/let EMBEDDED_DATA = [\s\S]*?; \/\*__EMBED_SLOT__\*\//, ()=>"let EMBEDDED_DATA = "+clean+"; /*__EMBED_SLOT__*/");
     const blob=new Blob([src],{type:"text/html"});
     const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download="bulalivre-offline.html";
+    a.href=URL.createObjectURL(blob); a.download="bulalivre-offline.html";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href),4000);
     toast("Arquivo offline gerado — salve no celular/computador");
   }catch(e){ toast("Falha ao gerar o arquivo: "+e.message); }
-  finally{ btn.disabled=false; btn.textContent=old; }
+  finally{ btn.disabled=false; }
 }
 
 let toastTmr;
@@ -257,24 +566,6 @@ function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("sho
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
-
-// Dica de instalação (iPhone/Android): como deixar como "app" offline.
-(function(){
-  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-  if (standalone || OFFLINE) return;
-  if (localStorage.getItem("bl_dismiss_install")==="1") return;
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const tip = document.createElement("div");
-  tip.className = "note";
-  tip.style.borderLeftColor = "var(--accent)";
-  tip.innerHTML = (isIOS
-    ? '📲 <b>Instalar no iPhone:</b> toque em <b>Compartilhar</b> (ícone de seta) e depois em <b>Adicionar à Tela de Início</b>. Vira um ícone de app e funciona offline.'
-    : '📲 <b>Instalar como app:</b> no menu do navegador, escolha <b>Instalar app</b> / <b>Adicionar à tela inicial</b>. Funciona offline.')
-    + ' <a href="#" id="blDismiss" style="white-space:nowrap">dispensar</a>';
-  const main = document.querySelector("main");
-  main.insertBefore(tip, main.firstChild);
-  document.getElementById("blDismiss").onclick = (ev)=>{ev.preventDefault();localStorage.setItem("bl_dismiss_install","1");tip.remove();};
-})();
 
 loadData(false);
 </script>
