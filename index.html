@@ -370,6 +370,8 @@ function href(path,params){
   const s=qs.toString();
   return "#/"+path+(s?"?"+s:"");
 }
+// Bulário Eletrônico da ANVISA: abre a consulta já com o nome do produto preenchido
+const bulaUrl = p => "https://consultas.anvisa.gov.br/#/bulario/?nomeProduto="+encodeURIComponent(p.nome);
 const hMed = p => "#/medicamento/"+encodeURIComponent(p.id);
 const hList = (kind,name) => "#/lista/"+kind+"/"+encodeURIComponent(name);
 
@@ -716,6 +718,8 @@ function viewDetail(id){
       ${cuBlk?`<div class="blk"><h2>Cuidados e quando evitar</h2>${cuBlk}</div>`:""}
       ${p.posologia?`<div class="blk"><h2>Posologia</h2><p>${esc(p.posologia)}</p></div>`:""}
       ${p.alerta&&p.alerta!=="—"?`<div class="alert"><b>⚠️ Atenção:</b> ${esc(p.alerta)}</div>`:""}
+      <div class="blk"><h2>Bula</h2><a class="btn pri" href="${bulaUrl(p)}" target="_blank" rel="noopener noreferrer">📄 Ver / baixar bula na ANVISA</a>
+        <div class="cuso" style="margin-top:8px">Abre o Bulário Eletrônico oficial com o nome do produto preenchido: clique em <b>Consultar</b> e baixe a bula do paciente ou do profissional (PDF). Requer internet.</div></div>
       ${doseFor(p)&&CIN[doseFor(p).id]?`<div class="blk"><h2>Dinâmica e cinética (referência)</h2>${cinHtml(doseFor(p).id)}</div>`:""}
       ${doseFor(p)?`<div class="blk"><a class="btn pri" href="#/calculadora/${doseFor(p).id}?p=${encodeURIComponent(p.id)}">🧮 Calcular dose deste medicamento</a></div>`:""}
       ${groups.length?"":`<div class="blk"><p class="muted">Ainda não temos resumo de uso e efeitos colaterais para este princípio ativo. Consulte a bula do produto.</p></div>`}
@@ -1073,7 +1077,7 @@ function initCalc(drugId,params){
       ${idt?`<div class="print-only rx-id">Paciente: ${esc(idt)}</div>`:""}
       <div class="rx-big">${fmt(r.qty)} <span>${r.unidade}</span></div>
       <div class="rx-line">a cada <b>${i.intervalo} h</b> (${r.dosesDia}×/dia) por <b>${i.dias} dia${i.dias===1?"":"s"}</b></div>
-      <div class="rx-sub">${esc(drug.nome)} · ${esc(apRot)}${bp?`<br><a href="${hMed(bp)}">${esc(bp.nome)}</a> — ${esc(bp.laboratorio)}`:""}</div>
+      <div class="rx-sub">${esc(drug.nome)} · ${esc(apRot)}${bp?`<br><a href="${hMed(bp)}">${esc(bp.nome)}</a> — ${esc(bp.laboratorio)} · <a href="${bulaUrl(bp)}" target="_blank" rel="noopener noreferrer">bula (ANVISA)</a>`:""}</div>
       <table class="rx-t">
         <tr><td>Dose-alvo</td><td>${fmt(r.alvo)} mg <small>(${esc(calcTxt)})</small></td></tr>
         <tr><td>Dose administrada</td><td>${fmt(r.entregue)} mg ${Math.abs(r.desvio)>0.5?`<small>(${r.desvio>0?"+":""}${r.desvio.toFixed(0)}% do alvo)</small>`:""}</td></tr>
