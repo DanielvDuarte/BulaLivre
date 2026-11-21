@@ -227,6 +227,10 @@
   .rx-btns{display:flex;gap:8px;margin-top:12px}
   .rx-btns .btn{cursor:pointer}
   .empty-rx p{color:var(--muted);margin:8px 0 0}
+  .cin{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:6px 0;font-size:14px}
+  .ph{margin:12px 0 2px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--brand)}
+  .ph:first-child{margin-top:4px}
+  .cin dt{color:var(--muted)}.cin dd{margin:0}
   .print-only{display:none}
   .rx-mini{display:none}
   .topsearch .sfield{flex-wrap:nowrap}
@@ -712,6 +716,7 @@ function viewDetail(id){
       ${cuBlk?`<div class="blk"><h2>Cuidados e quando evitar</h2>${cuBlk}</div>`:""}
       ${p.posologia?`<div class="blk"><h2>Posologia</h2><p>${esc(p.posologia)}</p></div>`:""}
       ${p.alerta&&p.alerta!=="—"?`<div class="alert"><b>⚠️ Atenção:</b> ${esc(p.alerta)}</div>`:""}
+      ${doseFor(p)&&CIN[doseFor(p).id]?`<div class="blk"><h2>Dinâmica e cinética (referência)</h2>${cinHtml(doseFor(p).id)}</div>`:""}
       ${doseFor(p)?`<div class="blk"><a class="btn pri" href="#/calculadora/${doseFor(p).id}?p=${encodeURIComponent(p.id)}">🧮 Calcular dose deste medicamento</a></div>`:""}
       ${groups.length?"":`<div class="blk"><p class="muted">Ainda não temos resumo de uso e efeitos colaterais para este princípio ativo. Consulte a bula do produto.</p></div>`}
       ${groups.length?`<div class="alert info">Informações gerais sobre o princípio ativo, em linguagem simples. Nem todo efeito listado acontece com todo mundo, e a lista não é completa: leia a <b>bula do produto</b> e fale com seu médico ou farmacêutico.</div>`:""}
@@ -875,6 +880,45 @@ function calcDose(d,i){
 function fmt(n){ return (Math.round(n*100)/100).toLocaleString("pt-BR",{maximumFractionDigits:2}); }
 /* CALC-ENGINE-END */
 
+/* Cinética (farmacocinética) — valores aproximados, via oral, adulto saudável. A validar por profissional. */
+const CIN = {
+ paracetamol:{inicio:"30–60 min",pico:"30–60 min",duracao:"4–6 h",meiaVida:"1,5–3 h (maior em hepatopatia e recém-nascidos)",eliminacao:"Hepática (conjugação); metabólitos na urina",alimento:"Pode atrasar a absorção, sem perda de efeito"},
+ dipirona:{inicio:"30–60 min",pico:"1–1,5 h (metabólito ativo)",duracao:"4–6 h",meiaVida:"≈ 2,5–4 h (metabólito ativo)",eliminacao:"Metabolizada no fígado; eliminação principalmente renal",alimento:"Sem efeito relevante"},
+ ibuprofeno:{inicio:"30–60 min",pico:"1–2 h",duracao:"6–8 h",meiaVida:"≈ 2 h",eliminacao:"Hepática (CYP2C9); metabólitos na urina",alimento:"Retarda a absorção; tomar com alimento reduz a irritação do estômago"},
+ amoxicilina:{inicio:"—",pico:"1–2 h",duracao:"Efeito depende do tempo acima da concentração inibitória (por isso 8–12 h)",meiaVida:"≈ 1–1,5 h (maior na insuficiência renal)",eliminacao:"Renal (grande parte inalterada)",alimento:"Absorção pouco afetada"},
+ azitromicina:{inicio:"—",pico:"2–3 h",duracao:"Efeito prolongado: concentra-se nos tecidos (esquemas de 3–5 dias)",meiaVida:"≈ 68 h (terminal)",eliminacao:"Principalmente biliar/fecal",alimento:"Suspensão e comprimidos: com ou sem alimento (ver bula do produto)"},
+ cefalexina:{inicio:"—",pico:"≈ 1 h",duracao:"Efeito depende do tempo acima da concentração inibitória (6–12 h)",meiaVida:"≈ 0,5–1,2 h (maior na insuficiência renal)",eliminacao:"Renal (> 80% inalterada)",alimento:"Retarda o pico, sem reduzir a absorção total"},
+ prednisolona:{inicio:"Horas (efeito anti-inflamatório)",pico:"1–2 h",duracao:"Efeito biológico 12–36 h (permite dose 1×/dia)",meiaVida:"2–4 h (plasmática); 12–36 h (biológica)",eliminacao:"Hepática; metabólitos na urina",alimento:"Sem efeito relevante; com alimento reduz o desconforto gástrico"},
+ ondansetrona:{inicio:"≈ 30 min",pico:"≈ 1,5–2 h",duracao:"≈ 8 h",meiaVida:"≈ 3–4 h (maior em idosos e hepatopatia grave)",eliminacao:"Hepática (múltiplas CYP)",alimento:"Pouco efeito; pode aumentar levemente a absorção"},
+ metronidazol:{inicio:"—",pico:"1–2 h",duracao:"Tratamento por vários dias (meia-vida longa)",meiaVida:"≈ 8 h",eliminacao:"Hepática (60–80% metabolizada) e renal",alimento:"Pode ser tomado com alimento para reduzir a náusea"}
+};
+/* Dinâmica (farmacodinâmica): como o medicamento age. Resumo para referência; a validar por profissional. */
+const DIN = {
+ paracetamol:{mecanismo:"Reduz a síntese de prostaglandinas no sistema nervoso central (ação sobre a ciclo-oxigenase central; mecanismo exato ainda debatido).",efeito:"Analgesia e redução da febre (centro termorregulador). Ação anti-inflamatória fraca."},
+ dipirona:{mecanismo:"Inibe a síntese de prostaglandinas (COX, sobretudo no SNC) e modula vias da dor; age por metabólitos ativos (4-MAA).",efeito:"Analgésica, antitérmica e espasmolítica (relaxa musculatura lisa)."},
+ ibuprofeno:{mecanismo:"Inibe de forma não seletiva a ciclo-oxigenase (COX-1 e COX-2), reduzindo prostaglandinas.",efeito:"Analgésico, anti-inflamatório e antitérmico. A inibição de COX-1 explica os efeitos sobre estômago, plaquetas e rins."},
+ amoxicilina:{mecanismo:"Betalactâmico: liga-se às proteínas ligadoras de penicilina e bloqueia a síntese da parede celular bacteriana.",efeito:"Bactericida (tempo-dependente). Espectro: Gram-positivos e alguns Gram-negativos; inativada por betalactamases."},
+ azitromicina:{mecanismo:"Macrolídeo: liga-se à subunidade 50S do ribossomo e inibe a síntese proteica bacteriana.",efeito:"Em geral bacteriostático. Espectro: germes respiratórios e atípicos (Mycoplasma, Chlamydia); ação imunomoduladora descrita."},
+ cefalexina:{mecanismo:"Cefalosporina de 1ª geração: bloqueia a síntese da parede celular bacteriana (PBPs).",efeito:"Bactericida (tempo-dependente). Espectro: principalmente Gram-positivos (estafilococos e estreptococos) e alguns Gram-negativos."},
+ prednisolona:{mecanismo:"Corticoide: liga-se ao receptor de glicocorticoide e altera a expressão gênica, reduzindo mediadores inflamatórios e a resposta imune.",efeito:"Anti-inflamatório, antialérgico e imunossupressor. Efeitos metabólicos: eleva a glicose e retém sódio/líquido."},
+ ondansetrona:{mecanismo:"Antagonista seletivo dos receptores 5-HT3 (no trato digestivo e na zona-gatilho do vômito no SNC).",efeito:"Antiemético: previne e trata náusea e vômito."},
+ metronidazol:{mecanismo:"Pró-fármaco: reduzido em anaeróbios e protozoários, gera radicais que danificam o DNA do microrganismo.",efeito:"Bactericida/protozoicida. Espectro: anaeróbios, Giardia, Entamoeba, Trichomonas."}
+};
+function cinHtml(id){
+  const c=CIN[id]; if(!c) return "";
+  const dn=DIN[id];
+  const dyn = dn ? `<h3 class="ph">Dinâmica — como age</h3><dl class="cin"><dt>Mecanismo de ação</dt><dd>${esc(dn.mecanismo)}</dd><dt>Efeito</dt><dd>${esc(dn.efeito)}</dd></dl>` : "";
+  const rows=[["Início de ação",c.inicio],["Pico",c.pico],["Duração do efeito",c.duracao],["Meia-vida",c.meiaVida],["Eliminação",c.eliminacao],["Alimentos",c.alimento]].filter(r=>r[1]&&r[1]!=="—");
+  return dyn+`<h3 class="ph">Cinética — como o corpo trata</h3><dl class="cin">${rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl><div class="cuso">Valores aproximados para adultos saudáveis, via oral. Podem variar com idade, função renal/hepática e formulação.</div>`;
+}
+
+/* Medicamento sem dados de referência: o app só faz a conta */
+const LIVRE={id:"livre",nome:"Outro medicamento (cálculo manual)",chaves:[],
+  uso:"Sem dados de referência: o app apenas faz a conta com os valores informados.",
+  ped:{modo:"dose",min:0,max:Infinity,padrao:""}, ad:{min:0,max:Infinity,padrao:""},
+  int:{ped:[4,6,8,12,24],ad:[4,6,8,12,24],pedPad:8,adPad:8}, dias:5,
+  notas:["Cálculo manual: nenhuma faixa de dose, limite máximo ou alerta de segurança é aplicado a este medicamento."], apres:[]};
+
 function doseFor(p){
   if(!p||p._subs.length!==1) return null;
   const s=norm(p._subs[0]);
@@ -890,7 +934,9 @@ function viewCalc(){
       <div class="cform noprint">
         <section class="cx"><h2><span>1</span>Medicamento</h2>
           <label class="fl">Princípio ativo<select id="cDrug"></select></label>
-          <div class="cuso" id="cUso"></div></section>
+          <div class="cuso" id="cUso"></div>
+          <details class="opt"><summary>Por que só alguns medicamentos?</summary>
+            <div class="cuso" id="cAvail"></div></details></section>
         <section class="cx"><h2><span>2</span>Paciente</h2>
           <div class="row2">
             <label class="fl">Idade<div class="inl"><input id="cIdade" inputmode="decimal" placeholder="5"><select id="cIdU">${opts([["a","anos"],["m","meses"]])}</select></div></label>
@@ -929,9 +975,11 @@ function viewCalc(){
 function initCalc(drugId,params){
   const g=id=>document.getElementById(id);
   const dsel=g("cDrug");
-  dsel.innerHTML=DOSES.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join("");
+  const ALL=DOSES.concat([LIVRE]);
+  dsel.innerHTML=ALL.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join("");
+  g("cAvail").innerHTML=`Hoje o app tem <b>${DOSES.length} medicamentos com doses de referência, alertas, dinâmica e cinética</b>. Os dados da ANVISA (que alimentam a consulta) trazem nome, laboratório e princípio ativo, mas <b>não trazem dose, concentração, dinâmica nem cinética</b>. Por isso cada medicamento da calculadora foi cadastrado à mão e precisa ser revisado por um profissional antes de entrar — a lista cresce aos poucos.<br><br>Para <b>qualquer outro medicamento</b> escolha “Outro medicamento (cálculo manual)”: o app faz a conta e escolhe o produto/marca da base, mas <b>sem faixas, limites ou alertas de segurança</b>.`;
   const preP=params.get("p")?BY_ID.get(params.get("p")):null;
-  const pre=DOSES.find(d=>d.id===drugId)||doseFor(preP)||DOSES[0];
+  const pre=ALL.find(d=>d.id===drugId)||doseFor(preP)||DOSES[0];
   dsel.value=pre.id;
   let drug=pre, dirty=false, curAp=null;
   document.title="Calculadora de dose · BulaLivre";
@@ -942,11 +990,12 @@ function initCalc(drugId,params){
 
   function modeDefaults(){
     const m=g("cModo").value;
-    g("cDose").value = String(m==="kg"?drug.ped.padrao:drug.ad.padrao).replace(".",",");
+    g("cDose").value = String(m==="fixa"?drug.ad.padrao:drug.ped.padrao).replace(".",",");
     dirty=false; faixa();
   }
   function faixa(){
     const m=g("cModo").value, nat=drug.ped.modo==="dose"?"dose":"dia";
+    if(drug===LIVRE){ g("cDoseLbl").textContent = m==="fixa"?"mg por dose":"mg/kg "+(m==="kgd"?"por dia":"por dose"); g("cFaixa").textContent="Sem faixa de referência: informe a dose prescrita."; return; }
     g("cDoseLbl").textContent = m==="kg" ? "mg/kg por "+nat : "mg por dose";
     g("cFaixa").textContent = "Faixa de referência: "+(m==="kg"? drug.ped.min+"–"+drug.ped.max+" mg/kg/"+nat+" (crianças)" : drug.ad.min+"–"+drug.ad.max+" mg por dose (adultos)")+".";
   }
@@ -955,12 +1004,12 @@ function initCalc(drugId,params){
     setOpts(g("cInt"),list.map(h=>[h,"a cada "+h+" h ("+Math.round(24/h)+"×/dia)"]), list.includes(keep)?keep:drug.int[gr+"Pad"]);
   }
   function loadDrug(){
-    drug=DOSES.find(d=>d.id===dsel.value);
+    drug=ALL.find(d=>d.id===dsel.value);
     g("cUso").textContent=drug.uso;
-    setOpts(g("cModo"),[["kg","mg/kg"],["fixa","mg (fixa)"]], grupo()==="ped"?"kg":"fixa");
+    setOpts(g("cModo"), drug===LIVRE?[["kg","mg/kg por dose"],["kgd","mg/kg por dia"],["fixa","mg (fixa)"]]:[["kg","mg/kg"],["fixa","mg (fixa)"]], grupo()==="ped"?"kg":"fixa");
     g("cInt").innerHTML=""; intervals();
     g("cDias").value=drug.dias;
-    setOpts(g("cAp"),drug.apres.map(a=>[a.id,esc(a.rot)]).concat([["_x","Outra apresentação…"]]),drug.apres[0].id);
+    setOpts(g("cAp"),drug.apres.map(a=>[a.id,esc(a.rot)]).concat([["_x","Outra apresentação…"]]),drug.apres.length?drug.apres[0].id:"_x");
     loadAp(); modeDefaults(); brandList();
   }
   function loadAp(){
@@ -980,18 +1029,22 @@ function initCalc(drugId,params){
   }
   function brandList(){
     const q=norm(g("cBrandQ").value), keep=g("cBrand").value;
-    let L=PRODS.filter(p=>p._subs.length===1 && drug.chaves.some(c=>norm(p._subs[0]).startsWith(c)) && (!q || (p._n+" "+norm(p.laboratorio)).includes(q)));
+    let L = drug===LIVRE
+      ? (q.length>=2 ? PRODS.filter(p=>(p._n+" "+norm(p.laboratorio)+" "+norm(p.pa)).includes(q)) : [])
+      : PRODS.filter(p=>p._subs.length===1 && drug.chaves.some(c=>norm(p._subs[0]).startsWith(c)) && (!q || (p._n+" "+norm(p.laboratorio)).includes(q)));
     L.sort((a,b)=>a._n<b._n?-1:a._n>b._n?1:0);
     const total=L.length; L=L.slice(0,80);
     if(preP && !q && !L.includes(preP) && doseFor(preP)===drug) L.unshift(preP);
     g("cBrand").innerHTML='<option value="">— não especificar —</option>'+L.map(p=>`<option value="${esc(p.id)}">${esc(p.nome)} — ${esc(p.laboratorio)}</option>`).join("")+(total>80?`<option disabled>… ${nf(total-80)} outros: refine a busca</option>`:"");
     if(keep && L.some(p=>p.id===keep)) g("cBrand").value=keep; else if(preP && !q && L.includes(preP) && !g("cBrand").dataset.touched) g("cBrand").value=preP.id;
-    g("cBrandInfo").innerHTML = total? nf(total)+" produto(s) com este princípio ativo na base." : "Nenhum produto encontrado.";
+    g("cBrandInfo").innerHTML = drug===LIVRE && !q ? "Digite o nome, princípio ativo ou laboratório para buscar qualquer produto da base." : (total? nf(total)+" produto(s) encontrado(s) na base." : "Nenhum produto encontrado.");
   }
 
   function read(){
+    let modo=g("cModo").value;
+    if(drug===LIVRE){ drug.ped.modo = modo==="kgd"?"dia":"dose"; if(modo==="kgd") modo="kg"; }
     return {
-      grupo:grupo(), modo:g("cModo").value, dose:numBR(g("cDose").value), intervalo:numBR(g("cInt").value), dias:Math.round(numBR(g("cDias").value)),
+      grupo:grupo(), modo, dose:numBR(g("cDose").value), intervalo:numBR(g("cInt").value), dias:Math.round(numBR(g("cDias").value)),
       peso:numBR(g("cPeso").value), idadeMeses:idadeMeses(),
       ap:{tipo:g("cTipo").value, conc:numBR(g("cConc").value), gotasPorMl:numBR(g("cGotas").value), partir:g("cPartir").checked, pack:numBR(g("cPack").value)}
     };
@@ -1032,6 +1085,7 @@ function initCalc(drugId,params){
       <div class="rx-btns noprint"><button class="btn pri" id="cCopy">Copiar texto</button><button class="btn" id="cPrint">Imprimir</button></div>
       <div class="print-only rx-date">Emitido em ${new Date().toLocaleDateString("pt-BR")} · calculado no BulaLivre — conferir antes de prescrever.</div>
     </div>
+    ${CIN[drug.id]?`<details class="opt noprint"><summary>Dinâmica e cinética (referência)</summary>${cinHtml(drug.id)}</details>`:""}
     ${INF?`<details class="opt noprint"><summary>Efeitos colaterais e cuidados (informação geral)</summary><div class="blk"><ul>${(INF.efeitos||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><ul>${(INF.cuidados||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></details>`:""}
     <div class="alert info noprint">Ferramenta de <b>apoio ao cálculo</b>: não substitui o julgamento clínico. As doses de referência precisam ser validadas e a decisão e a conferência final são do prescritor.</div>`;
     g("cCopy").onclick=()=>{
@@ -1048,7 +1102,12 @@ function initCalc(drugId,params){
   g("cAp").onchange=()=>{ loadAp(); recalc(); };
   g("cTipo").onchange=()=>{ tipoUI(); recalc(); };
   g("cBrandQ").oninput=()=>{ brandList(); };
-  g("cBrand").onchange=()=>{ g("cBrand").dataset.touched=1; recalc(); };
+  g("cBrand").onchange=()=>{
+    g("cBrand").dataset.touched=1;
+    const bp=BY_ID.get(g("cBrand").value), dd=bp&&doseFor(bp);
+    if(drug===LIVRE && dd) g("cBrandInfo").innerHTML=`Este princípio ativo tem dados de referência: escolha <b>${esc(dd.nome)}</b> na lista de medicamentos para ver faixas, alertas, dinâmica e cinética.`;
+    recalc();
+  };
   g("cDose").oninput=()=>{ dirty=true; recalc(); };
   const regroup=()=>{
     const gr=grupo(), cur=g("cModo").value;
