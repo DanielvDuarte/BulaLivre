@@ -184,6 +184,67 @@
     .item .tag{display:none}
     .dcard{padding:16px}
   }
+
+  /* ---------- calculadora ---------- */
+  a.ibtn{text-decoration:none}
+  .calcbtn{margin-top:18px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;padding:9px 16px;border-radius:999px;font-weight:600;font-size:14px}
+  .calcbtn:hover{background:rgba(255,255,255,.28);text-decoration:none}
+  .calcbtn small{opacity:.8;font-weight:400}
+  .btn{display:inline-block;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600}
+  .btn:hover{border-color:var(--brand);color:var(--brand);text-decoration:none}
+  .btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.pri:hover{background:var(--brand2);color:#fff}
+  .cg{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+  @media (min-width:900px){ .calc.page{max-width:1080px} .cg{grid-template-columns:minmax(0,1fr) 400px} .cout{position:sticky;top:76px} }
+  .cx{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+  .cx h2{margin:0 0 10px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .cx h2 span{width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;display:grid;place-items:center}
+  .fl{display:block;font-size:12.5px;color:var(--muted);margin:0 0 10px;font-weight:500}
+  .fl input,.fl select{display:block;width:100%;margin-top:4px;height:42px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--ink);font:inherit;font-size:16px;padding:0 10px;outline:none}
+  .fl input:focus,.fl select:focus{border-color:var(--brand);background:var(--surface)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .inl{display:flex;gap:6px}.inl input{flex:1;min-width:0}.inl select{width:auto}
+  .chk{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:2px 0 10px}
+  .cuso{font-size:12.5px;color:var(--muted);margin:-4px 0 10px}
+  details.opt{margin:2px 0 12px;font-size:14px}
+  details.opt summary{cursor:pointer;color:var(--brand);font-weight:600;margin-bottom:8px}
+  .cout .rx{background:var(--surface);border:1.5px solid var(--brand);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+  .rx.rx-bad{border-color:var(--danger)}
+  .rx-h{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:700}
+  .rx-h small{text-transform:none;letter-spacing:0;font-weight:500;margin-left:6px}
+  .rx-big{font-size:clamp(34px,8vw,46px);font-weight:800;color:var(--brand);letter-spacing:-1px;line-height:1.1;margin:6px 0 2px}
+  .rx-big span{font-size:.45em;font-weight:700;letter-spacing:0}
+  .rx-line{font-size:16px}
+  .rx-sub{color:var(--muted);font-size:13.5px;margin:6px 0 12px}
+  .rx-t{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:10px}
+  .rx-t td{padding:6px 0;border-top:1px solid var(--line);vertical-align:top}
+  .rx-t td:first-child{color:var(--muted);width:42%}
+  .rx-t small,.al small{color:var(--muted)}
+  .al{border-radius:10px;padding:8px 12px;font-size:13.5px;margin:6px 0;border-left:4px solid var(--line);background:var(--surface2)}
+  .al-perigo{background:var(--danger-bg);border-left-color:var(--danger);color:var(--ink)}
+  .al-aviso{background:var(--warn-bg);border-left-color:var(--warn);color:var(--ink)}
+  .rx-btns{display:flex;gap:8px;margin-top:12px}
+  .rx-btns .btn{cursor:pointer}
+  .empty-rx p{color:var(--muted);margin:8px 0 0}
+  .print-only{display:none}
+  .rx-mini{display:none}
+  .topsearch .sfield{flex-wrap:nowrap}
+  .topsearch .sfield input{min-width:0}
+  @media (max-width:899px){
+    .rx-mini{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:35;justify-content:space-between;align-items:center;gap:10px;background:var(--brand);color:#fff;border:0;border-radius:14px;padding:13px 16px;font:inherit;font-size:15px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+    .rx-mini b{font-weight:500;font-size:13px;opacity:.9}
+    .calc{padding-bottom:70px}
+  }
+  @media print{
+    body{background:#fff;color:#000}
+    .topbar,footer,.noprint,.note,#toast{display:none!important}
+    .print-only{display:block!important}
+    .cg{display:block}.cout{position:static}
+    .cout .rx{box-shadow:none;border:1px solid #000}
+    .rx-big{color:#000}
+    main{padding:0}
+  }
 </style>
 </head>
 <body>
@@ -195,6 +256,9 @@
     </a>
     <div class="topsearch sbox" id="topSearch"></div>
     <div class="topbtns">
+      <a class="ibtn" href="#/calculadora" title="Calculadora de dose (profissionais)" aria-label="Calculadora de dose">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h.01M12 19h.01M16 19h.01"/></svg>
+      </a>
       <button class="ibtn" id="btnUpdate" title="Recarrega a base de dados mais recente publicada" aria-label="Atualizar base">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/><path d="M3 12A9 9 0 0 1 18.5 5.8L21 8"/><path d="M21 3v5h-5"/></svg>
       </button>
@@ -316,6 +380,7 @@ function route(){
   if(view===""){ app.innerHTML=viewHome(); document.title="BulaLivre — Consulta de Medicamentos"; }
   else if(view==="busca"){ app.innerHTML=viewSearch(params); }
   else if(view==="sintomas"){ app.innerHTML=viewSintomas(params); }
+  else if(view==="calculadora"){ app.innerHTML=viewCalc(); }
   else if(view==="medicamento"){ app.innerHTML=viewDetail(parts[1]||""); }
   else if(view==="lista"){ app.innerHTML=viewList(parts[1],parts.slice(2).join("/"),params); }
   else { location.hash="#/"; return; }
@@ -323,6 +388,7 @@ function route(){
   lastQ=q;
   mountSearch($("topSearch"),{val:q,ph:"Buscar medicamento, sintoma…"});
   const hs=$("heroSearch"); if(hs) mountSearch(hs,{ph:"Digite seus sintomas ou o nome do remédio",hero:true,multi:true});
+  if(view==="calculadora") initCalc(parts[1]||"",params);
   const ss=$("symSearch"); if(ss) mountSearch(ss,{ph:"Adicionar sintoma…",multi:true,live:true,chips:symNames(params),focus:!!params.get("f")});
 }
 window.addEventListener("hashchange",route);
@@ -474,6 +540,7 @@ function viewHome(){
       <h1>Consulta de medicamentos</h1>
       <p>Pesquise por medicamento ou some seus sintomas — ex.: <i>dor de cabeça</i> + <i>febre</i>.</p>
       <div class="sbox" id="heroSearch"></div>
+      <a class="calcbtn" href="#/calculadora">🧮 Calculadora de dose <small>para profissionais</small></a>
       <div class="explore">Explorar:
         <a href="${href("busca",{aba:"produtos"})}">Produtos</a> ·
         <a href="${href("busca",{aba:"substancias"})}">Princípios ativos</a> ·
@@ -645,11 +712,354 @@ function viewDetail(id){
       ${cuBlk?`<div class="blk"><h2>Cuidados e quando evitar</h2>${cuBlk}</div>`:""}
       ${p.posologia?`<div class="blk"><h2>Posologia</h2><p>${esc(p.posologia)}</p></div>`:""}
       ${p.alerta&&p.alerta!=="—"?`<div class="alert"><b>⚠️ Atenção:</b> ${esc(p.alerta)}</div>`:""}
+      ${doseFor(p)?`<div class="blk"><a class="btn pri" href="#/calculadora/${doseFor(p).id}?p=${encodeURIComponent(p.id)}">🧮 Calcular dose deste medicamento</a></div>`:""}
       ${groups.length?"":`<div class="blk"><p class="muted">Ainda não temos resumo de uso e efeitos colaterais para este princípio ativo. Consulte a bula do produto.</p></div>`}
       ${groups.length?`<div class="alert info">Informações gerais sobre o princípio ativo, em linguagem simples. Nem todo efeito listado acontece com todo mundo, e a lista não é completa: leia a <b>bula do produto</b> e fale com seu médico ou farmacêutico.</div>`:""}
     </article>
     ${related.length?`<section class="sec"><h3>Mais produtos com ${esc(cap(p._subs[0]))}</h3><div class="list">${related.map(r=>prodItem(r,"")).join("")}</div></section>`:""}
     ${noteBox()}</div>`;
+}
+
+/* ================= CALCULADORA DE DOSE (profissionais) =================
+   Doses de REFERÊNCIA compiladas de bulas/consensos usuais. Todos os valores são
+   editáveis na tela e DEVEM ser validados por profissional de saúde antes do uso clínico.
+   Estrutura de cada item:
+   ped: {modo:"dose"|"dia", min, max, padrao}  mg/kg por dose ou por dia (crianças/adolescentes)
+   ad:  {min, max, padrao}                      mg por dose (adultos)
+   int: intervalos permitidos (h) e padrão;  dias: duração padrão
+   maxDiaMg / maxDiaMgKg / maxDoseMg: limites; idadeMinMeses; intervaloMinH; renal: alerta de função renal */
+const DOSES = [
+ {id:"paracetamol",nome:"Paracetamol",chaves:["paracetamol"],uso:"Analgésico e antitérmico.",
+  ped:{modo:"dose",min:10,max:15,padrao:10}, ad:{min:500,max:1000,padrao:500},
+  int:{ped:[4,6,8],ad:[4,6,8],pedPad:6,adPad:6}, dias:3, maxDiaMg:4000, maxDiaMgKg:75, intervaloMinH:4,
+  notas:["Atenção a associações que já contêm paracetamol. Em idosos, hepatopatas ou etilistas, considere limite diário menor (ex.: 3 g).","Recém-nascidos e lactentes muito jovens: usar esquema específico."],
+  apres:[
+   {id:"g200",rot:"gotas 200 mg/mL",tipo:"gotas",conc:200,gotasPorMl:35,pack:15},
+   {id:"s32",rot:"suspensão oral 32 mg/mL (160 mg/5 mL)",tipo:"susp",conc:32,pack:100},
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:20},
+   {id:"c750",rot:"comprimido 750 mg",tipo:"comp",conc:750,pack:20}]},
+ {id:"dipirona",nome:"Dipirona (metamizol)",chaves:["dipirona"],uso:"Analgésico e antitérmico.",
+  ped:{modo:"dose",min:10,max:25,padrao:10}, ad:{min:500,max:1000,padrao:500},
+  int:{ped:[6,8],ad:[6,8],pedPad:6,adPad:6}, dias:3, maxDiaMg:4000, maxDiaMgKg:100, idadeMinMeses:3, intervaloMinH:4,
+  notas:["Não indicada em lactentes com menos de 3 meses ou menos de 5 kg (ver bula).","Risco raro de agranulocitose e reações alérgicas graves."],
+  apres:[
+   {id:"g500",rot:"gotas 500 mg/mL",tipo:"gotas",conc:500,gotasPorMl:20,pack:10},
+   {id:"s50",rot:"solução oral 50 mg/mL (250 mg/5 mL)",tipo:"susp",conc:50,pack:100},
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:10},
+   {id:"c1000",rot:"comprimido 1 g",tipo:"comp",conc:1000,pack:10}]},
+ {id:"ibuprofeno",nome:"Ibuprofeno",chaves:["ibuprofeno"],uso:"Anti-inflamatório, analgésico e antitérmico.",
+  ped:{modo:"dose",min:5,max:10,padrao:5}, ad:{min:200,max:800,padrao:400},
+  int:{ped:[6,8],ad:[6,8],pedPad:8,adPad:8}, dias:3, maxDiaMg:2400, maxDiaMgKg:40, maxDoseMg:800, idadeMinMeses:6, intervaloMinH:6, renal:true,
+  notas:["Evitar em desidratação, dengue suspeita, úlcera, asma sensível a AINEs e doença renal.","Administrar após alimentação."],
+  apres:[
+   {id:"g50",rot:"gotas 50 mg/mL",tipo:"gotas",conc:50,gotasPorMl:20,pack:30},
+   {id:"g100",rot:"gotas 100 mg/mL",tipo:"gotas",conc:100,gotasPorMl:20,pack:20},
+   {id:"s20",rot:"suspensão oral 20 mg/mL (100 mg/5 mL)",tipo:"susp",conc:20,pack:100},
+   {id:"c200",rot:"comprimido 200 mg",tipo:"comp",conc:200,pack:20},
+   {id:"c400",rot:"comprimido 400 mg",tipo:"comp",conc:400,pack:20},
+   {id:"c600",rot:"comprimido 600 mg",tipo:"comp",conc:600,pack:20}]},
+ {id:"amoxicilina",nome:"Amoxicilina",chaves:["amoxicilina"],uso:"Antibiótico (penicilina).",
+  ped:{modo:"dia",min:25,max:90,padrao:50}, ad:{min:250,max:1000,padrao:500},
+  int:{ped:[8,12],ad:[8,12],pedPad:8,adPad:8}, dias:7, maxDiaMg:3000, maxDiaMgKg:90, renal:true,
+  notas:["Perguntar sobre alergia a penicilinas.","Validade da suspensão após reconstituição: ver bula do produto."],
+  apres:[
+   {id:"s50",rot:"suspensão oral 250 mg/5 mL (50 mg/mL)",tipo:"susp",conc:50,pack:150},
+   {id:"s80",rot:"suspensão oral 400 mg/5 mL (80 mg/mL)",tipo:"susp",conc:80,pack:70},
+   {id:"s100",rot:"suspensão oral 500 mg/5 mL (100 mg/mL)",tipo:"susp",conc:100,pack:100},
+   {id:"c500",rot:"cápsula/comprimido 500 mg",tipo:"comp",conc:500,pack:21}]},
+ {id:"azitromicina",nome:"Azitromicina",chaves:["azitromicina"],uso:"Antibiótico (macrolídeo).",
+  ped:{modo:"dose",min:5,max:10,padrao:10}, ad:{min:250,max:500,padrao:500},
+  int:{ped:[24],ad:[24],pedPad:24,adPad:24}, dias:3, maxDiaMg:500, maxDoseMg:500, idadeMinMeses:6, renal:false,
+  notas:["Esquemas usuais: 10 mg/kg/dia por 3 dias, ou 10 mg/kg no 1º dia e 5 mg/kg do 2º ao 5º dia (ajuste a dose/duração manualmente).","Risco de prolongamento do intervalo QT; cuidado com outros fármacos que o prolongam."],
+  apres:[
+   {id:"s40",rot:"suspensão oral 200 mg/5 mL (40 mg/mL)",tipo:"susp",conc:40,pack:15},
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:3}]},
+ {id:"cefalexina",nome:"Cefalexina",chaves:["cefalexina"],uso:"Antibiótico (cefalosporina).",
+  ped:{modo:"dia",min:25,max:50,padrao:50}, ad:{min:250,max:1000,padrao:500},
+  int:{ped:[6,8,12],ad:[6,8,12],pedPad:6,adPad:6}, dias:7, maxDiaMg:4000, maxDiaMgKg:100, renal:true,
+  notas:["Cuidado em alergia a penicilinas/cefalosporinas.","Validade da suspensão após reconstituição: ver bula do produto."],
+  apres:[
+   {id:"s50",rot:"suspensão oral 250 mg/5 mL (50 mg/mL)",tipo:"susp",conc:50,pack:100},
+   {id:"s100",rot:"suspensão oral 500 mg/5 mL (100 mg/mL)",tipo:"susp",conc:100,pack:100},
+   {id:"c500",rot:"cápsula/comprimido 500 mg",tipo:"comp",conc:500,pack:8}]},
+ {id:"prednisolona",nome:"Prednisolona",chaves:["prednisolona"],uso:"Corticoide (anti-inflamatório/antialérgico).",
+  ped:{modo:"dia",min:0.5,max:2,padrao:1}, ad:{min:5,max:60,padrao:20},
+  int:{ped:[12,24],ad:[12,24],pedPad:24,adPad:24}, dias:5, maxDiaMg:60,
+  notas:["Em uso prolongado (> 7–14 dias) avaliar desmame; atenção a diabetes, hipertensão e infecções.","Tomar preferencialmente pela manhã, junto à alimentação."],
+  apres:[
+   {id:"s3",rot:"solução oral 3 mg/mL",tipo:"susp",conc:3,pack:60},
+   {id:"s1",rot:"solução oral 1 mg/mL",tipo:"susp",conc:1,pack:60},
+   {id:"c5",rot:"comprimido 5 mg",tipo:"comp",conc:5,pack:20},
+   {id:"c20",rot:"comprimido 20 mg",tipo:"comp",conc:20,pack:10}]},
+ {id:"ondansetrona",nome:"Ondansetrona",chaves:["ondansetrona"],uso:"Antiemético (náusea e vômito).",
+  ped:{modo:"dose",min:0.1,max:0.15,padrao:0.15}, ad:{min:4,max:8,padrao:4},
+  int:{ped:[8,12],ad:[8,12],pedPad:8,adPad:8}, dias:1, maxDiaMg:24, maxDoseMg:8, idadeMinMeses:6,
+  notas:["Risco de prolongamento do intervalo QT.","Segurança em menores de 6 meses não estabelecida (ver bula)."],
+  apres:[
+   {id:"s08",rot:"solução oral 0,8 mg/mL (4 mg/5 mL)",tipo:"susp",conc:0.8,pack:50},
+   {id:"c4",rot:"comprimido 4 mg",tipo:"comp",conc:4,pack:10},
+   {id:"c8",rot:"comprimido 8 mg",tipo:"comp",conc:8,pack:10}]},
+ {id:"metronidazol",nome:"Metronidazol",chaves:["metronidazol"],uso:"Antimicrobiano (protozoários e anaeróbios).",
+  ped:{modo:"dia",min:15,max:30,padrao:15}, ad:{min:250,max:500,padrao:500},
+  int:{ped:[8,12],ad:[8,12],pedPad:8,adPad:8}, dias:5, maxDiaMg:4000, maxDiaMgKg:50, renal:true,
+  notas:["Não ingerir álcool durante o tratamento e por 48 h após.","Dose e duração variam conforme a indicação (giardíase, amebíase, anaeróbios)."],
+  apres:[
+   {id:"s40",rot:"suspensão oral 200 mg/5 mL (40 mg/mL)",tipo:"susp",conc:40,pack:80},
+   {id:"c250",rot:"comprimido 250 mg",tipo:"comp",conc:250,pack:20},
+   {id:"c400",rot:"comprimido 400 mg",tipo:"comp",conc:400,pack:20},
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:10}]}
+];
+
+/* CALC-ENGINE-START */
+function numBR(v){ const n=parseFloat(String(v==null?"":v).replace(",",".")); return isFinite(n)?n:NaN; }
+// Depuração do ClCr (Cockcroft-Gault), adultos
+function crcl(idadeAnos,peso,crea,sexo){
+  if(!(idadeAnos>=18)||!(peso>0)||!(crea>0)) return NaN;
+  const v=((140-idadeAnos)*peso)/(72*crea);
+  return sexo==="f"?v*0.85:v;
+}
+/* i: {grupo:"ped"|"ad", modo:"kg"|"fixa", dose, intervalo, dias, peso, idadeMeses, crcl,
+       ap:{tipo:"gotas"|"susp"|"comp", conc, gotasPorMl, partir, pack}} */
+function calcDose(d,i){
+  const o={alertas:[],ok:false}; const A=(n,t)=>o.alertas.push({n,t});
+  const ped=i.grupo==="ped", dosesDia=Math.round(24/i.intervalo), nativa=d.ped.modo;
+  if(!(i.dose>0)){ o.erro="Informe a dose."; return o; }
+  if(i.modo==="kg" && !(i.peso>0)){ o.erro="Informe o peso do paciente para calcular por mg/kg."; return o; }
+  if(!i.ap || !(i.ap.conc>0)){ o.erro="Informe a concentração (mg/mL) ou a dosagem (mg) da apresentação."; return o; }
+  if(i.ap.tipo==="gotas" && !(i.ap.gotasPorMl>0)){ o.erro="Informe quantas gotas equivalem a 1 mL."; return o; }
+  if(!(i.dias>=1)){ o.erro="Informe a duração do tratamento (dias)."; return o; }
+  const alvo = i.modo==="fixa" ? i.dose : (nativa==="dose" ? i.dose*i.peso : i.dose*i.peso/dosesDia);
+  let qty, entregue, unidade;
+  if(i.ap.tipo==="gotas"){
+    qty=Math.max(1,Math.round(alvo/i.ap.conc*i.ap.gotasPorMl));
+    entregue=qty/i.ap.gotasPorMl*i.ap.conc; unidade=qty===1?"gota":"gotas";
+    o.ml=qty/i.ap.gotasPorMl;
+  }else if(i.ap.tipo==="susp"){
+    qty=Math.max(0.1,Math.round(alvo/i.ap.conc*10)/10);
+    entregue=qty*i.ap.conc; unidade="mL"; o.ml=qty;
+  }else{
+    const step=i.ap.partir?0.5:1;
+    qty=Math.max(step,Math.round(alvo/i.ap.conc/step)*step);
+    entregue=qty*i.ap.conc; unidade=qty===1?"comprimido":"comprimidos";
+  }
+  const desvio=(entregue-alvo)/alvo*100;
+  if(Math.abs(desvio)>10) A("aviso","O arredondamento prático altera a dose em "+(desvio>0?"+":"")+desvio.toFixed(0)+"% em relação ao alvo ("+alvo.toFixed(1)+" mg). Considere outra apresentação.");
+  // faixa de referência da dose informada
+  const fx = i.modo==="fixa" ? d.ad : d.ped;
+  const uni = i.modo==="fixa" ? "mg por dose" : "mg/kg/"+(nativa==="dose"?"dose":"dia");
+  if(i.dose<fx.min) A("aviso","Dose abaixo da faixa de referência ("+fx.min+"–"+fx.max+" "+uni+").");
+  if(i.dose>fx.max) A("perigo","Dose acima da faixa de referência ("+fx.min+"–"+fx.max+" "+uni+").");
+  // limites sobre o que de fato será administrado
+  const dia=entregue*dosesDia;
+  if(d.maxDoseMg && entregue>d.maxDoseMg+1e-9) A("perigo","Dose única de "+entregue.toFixed(0)+" mg acima do máximo de "+d.maxDoseMg+" mg.");
+  if(d.maxDiaMg && dia>d.maxDiaMg+1e-9) A("perigo","Dose diária de "+dia.toFixed(0)+" mg acima do máximo de "+d.maxDiaMg+" mg/dia.");
+  if(i.peso>0 && d.maxDiaMgKg){
+    const kgDia=dia/i.peso;
+    if(kgDia>d.maxDiaMgKg+1e-9) A("perigo","Dose diária de "+kgDia.toFixed(0)+" mg/kg acima do máximo de "+d.maxDiaMgKg+" mg/kg/dia.");
+  }
+  if(ped && entregue>d.ad.max+1e-9) A("aviso","Dose acima da dose máxima de adulto ("+d.ad.max+" mg por dose).");
+  if(d.idadeMinMeses && i.idadeMeses>=0 && i.idadeMeses<d.idadeMinMeses) A("perigo","Paciente abaixo da idade mínima de uso indicada ("+d.idadeMinMeses+" meses). Confirme na bula.");
+  if(i.idadeMeses>=0 && i.idadeMeses<1) A("aviso","Neonato: doses costumam ser específicas; confirme em fonte pediátrica.");
+  if(d.intervaloMinH && i.intervalo<d.intervaloMinH) A("perigo","Intervalo menor que o mínimo usual ("+d.intervaloMinH+" h).");
+  if(d.renal && i.crcl>=0 && i.crcl<60) A(i.crcl<30?"perigo":"aviso","Depuração de creatinina estimada em "+i.crcl.toFixed(0)+" mL/min: verifique ajuste de dose/intervalo na bula.");
+  if(i.peso>0 && (i.peso<2||i.peso>250)) A("aviso","Peso informado incomum ("+i.peso+" kg). Confira o valor.");
+  // totais
+  const dosesTotal=dosesDia*i.dias; const totalQty=qty*dosesTotal;
+  let totalTxt, emb=null;
+  if(i.ap.tipo==="gotas"){ const tml=totalQty/i.ap.gotasPorMl; totalTxt=fmt(tml)+" mL ("+totalQty+" gotas)"; if(i.ap.pack>0) emb={n:Math.ceil(tml/i.ap.pack-1e-9),un:"frasco(s) de "+fmt(i.ap.pack)+" mL"}; }
+  else if(i.ap.tipo==="susp"){ totalTxt=fmt(totalQty)+" mL"; if(i.ap.pack>0) emb={n:Math.ceil(totalQty/i.ap.pack-1e-9),un:"frasco(s) de "+fmt(i.ap.pack)+" mL"}; }
+  else{ totalTxt=fmt(totalQty)+" comprimido(s)"; if(i.ap.pack>0) emb={n:Math.ceil(totalQty/i.ap.pack-1e-9),un:"caixa(s) de "+fmt(i.ap.pack)+" comprimidos"}; }
+  Object.assign(o,{ok:true,alvo,qty,unidade,entregue,desvio,dosesDia,dosesTotal,dia,kgDia:i.peso>0?dia/i.peso:null,totalTxt,emb,nativa});
+  return o;
+}
+function fmt(n){ return (Math.round(n*100)/100).toLocaleString("pt-BR",{maximumFractionDigits:2}); }
+/* CALC-ENGINE-END */
+
+function doseFor(p){
+  if(!p||p._subs.length!==1) return null;
+  const s=norm(p._subs[0]);
+  return DOSES.find(d=>d.chaves.some(c=>s.startsWith(c)))||null;
+}
+
+function viewCalc(){
+  const opts=a=>a.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");
+  return `<div class="page calc">
+    <h1 class="title">Calculadora de dose</h1>
+    <div class="sub noprint">Apoio ao cálculo de posologia para profissionais de saúde — adultos e crianças. Nada digitado aqui é salvo ou enviado.</div>
+    <div class="cg">
+      <div class="cform noprint">
+        <section class="cx"><h2><span>1</span>Medicamento</h2>
+          <label class="fl">Princípio ativo<select id="cDrug"></select></label>
+          <div class="cuso" id="cUso"></div></section>
+        <section class="cx"><h2><span>2</span>Paciente</h2>
+          <div class="row2">
+            <label class="fl">Idade<div class="inl"><input id="cIdade" inputmode="decimal" placeholder="5"><select id="cIdU">${opts([["a","anos"],["m","meses"]])}</select></div></label>
+            <label class="fl">Peso (kg)<input id="cPeso" inputmode="decimal" placeholder="18"></label></div>
+          <details class="opt"><summary>Função renal (opcional, adultos)</summary>
+            <div class="row2">
+              <label class="fl">Sexo<select id="cSexo">${opts([["","—"],["m","Masculino"],["f","Feminino"]])}</select></label>
+              <label class="fl">Creatinina (mg/dL)<input id="cCrea" inputmode="decimal"></label></div>
+            <div class="cuso" id="cCrcl"></div></details>
+          <label class="fl">Identificação (opcional — aparece só na impressão)<input id="cId" placeholder="nome ou iniciais"></label></section>
+        <section class="cx"><h2><span>3</span>Posologia</h2>
+          <div class="row2">
+            <label class="fl">Base da dose<select id="cModo"></select></label>
+            <label class="fl"><span id="cDoseLbl">Dose</span><input id="cDose" inputmode="decimal"></label></div>
+          <div class="cuso" id="cFaixa"></div>
+          <div class="row2">
+            <label class="fl">Intervalo<select id="cInt"></select></label>
+            <label class="fl">Duração (dias)<input id="cDias" inputmode="numeric"></label></div></section>
+        <section class="cx"><h2><span>4</span>Apresentação e marca</h2>
+          <label class="fl">Apresentação<select id="cAp"></select></label>
+          <div class="row3">
+            <label class="fl" id="cTipoW">Tipo<select id="cTipo">${opts([["susp","líquido (mL)"],["gotas","gotas"],["comp","comprimido"]])}</select></label>
+            <label class="fl"><span id="cConcL">mg/mL</span><input id="cConc" inputmode="decimal"></label>
+            <label class="fl" id="cGotasW">Gotas por mL<input id="cGotas" inputmode="decimal"></label>
+            <label class="fl"><span id="cPackL">Embalagem</span><input id="cPack" inputmode="decimal"></label></div>
+          <label class="chk" id="cPartirW"><input type="checkbox" id="cPartir"> Comprimido sulcado — permitir meio comprimido</label>
+          <div class="cuso">Concentração, gotas/mL e embalagem variam entre fabricantes: confira na bula do produto escolhido.</div>
+          <label class="fl">Produto / marca (opcional)<input id="cBrandQ" placeholder="buscar por nome ou laboratório"><select id="cBrand"></select></label>
+          <div class="cuso" id="cBrandInfo"></div></section>
+      </div>
+      <aside class="cout" id="cOut"></aside>
+    </div>
+    ${noteBox()}</div>`;
+}
+
+function initCalc(drugId,params){
+  const g=id=>document.getElementById(id);
+  const dsel=g("cDrug");
+  dsel.innerHTML=DOSES.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join("");
+  const preP=params.get("p")?BY_ID.get(params.get("p")):null;
+  const pre=DOSES.find(d=>d.id===drugId)||doseFor(preP)||DOSES[0];
+  dsel.value=pre.id;
+  let drug=pre, dirty=false, curAp=null;
+  document.title="Calculadora de dose · BulaLivre";
+
+  const idadeMeses=()=>{ const v=numBR(g("cIdade").value); if(!(v>=0)) return -1; return g("cIdU").value==="a"?v*12:v; };
+  const grupo=()=>{ const m=idadeMeses(), pw=numBR(g("cPeso").value); if(m>=0) return m<216?"ped":"ad"; return pw>0&&pw<40?"ped":"ad"; };
+  const setOpts=(sel,list,val)=>{ sel.innerHTML=list.map(([v,l])=>`<option value="${v}">${l}</option>`).join(""); if(val!==undefined) sel.value=val; };
+
+  function modeDefaults(){
+    const m=g("cModo").value;
+    g("cDose").value = String(m==="kg"?drug.ped.padrao:drug.ad.padrao).replace(".",",");
+    dirty=false; faixa();
+  }
+  function faixa(){
+    const m=g("cModo").value, nat=drug.ped.modo==="dose"?"dose":"dia";
+    g("cDoseLbl").textContent = m==="kg" ? "mg/kg por "+nat : "mg por dose";
+    g("cFaixa").textContent = "Faixa de referência: "+(m==="kg"? drug.ped.min+"–"+drug.ped.max+" mg/kg/"+nat+" (crianças)" : drug.ad.min+"–"+drug.ad.max+" mg por dose (adultos)")+".";
+  }
+  function intervals(){
+    const gr=grupo(), list=drug.int[gr], keep=numBR(g("cInt").value);
+    setOpts(g("cInt"),list.map(h=>[h,"a cada "+h+" h ("+Math.round(24/h)+"×/dia)"]), list.includes(keep)?keep:drug.int[gr+"Pad"]);
+  }
+  function loadDrug(){
+    drug=DOSES.find(d=>d.id===dsel.value);
+    g("cUso").textContent=drug.uso;
+    setOpts(g("cModo"),[["kg","mg/kg"],["fixa","mg (fixa)"]], grupo()==="ped"?"kg":"fixa");
+    g("cInt").innerHTML=""; intervals();
+    g("cDias").value=drug.dias;
+    setOpts(g("cAp"),drug.apres.map(a=>[a.id,esc(a.rot)]).concat([["_x","Outra apresentação…"]]),drug.apres[0].id);
+    loadAp(); modeDefaults(); brandList();
+  }
+  function loadAp(){
+    const a=drug.apres.find(x=>x.id===g("cAp").value);
+    const custom=!a;
+    if(a){ g("cTipo").value=a.tipo; g("cConc").value=String(a.conc).replace(".",","); g("cGotas").value=a.gotasPorMl||""; g("cPack").value=a.pack||""; }
+    else { g("cConc").value=""; g("cGotas").value=""; g("cPack").value=""; }
+    g("cTipoW").style.display=custom?"":"none";
+    tipoUI();
+  }
+  function tipoUI(){
+    const t=g("cTipo").value;
+    g("cConcL").textContent = t==="comp" ? "mg por comprimido" : "mg por mL";
+    g("cPackL").textContent = t==="comp" ? "Comprimidos/caixa" : "mL/frasco";
+    g("cGotasW").style.display = t==="gotas"?"":"none";
+    g("cPartirW").style.display = t==="comp"?"":"none";
+  }
+  function brandList(){
+    const q=norm(g("cBrandQ").value), keep=g("cBrand").value;
+    let L=PRODS.filter(p=>p._subs.length===1 && drug.chaves.some(c=>norm(p._subs[0]).startsWith(c)) && (!q || (p._n+" "+norm(p.laboratorio)).includes(q)));
+    L.sort((a,b)=>a._n<b._n?-1:a._n>b._n?1:0);
+    const total=L.length; L=L.slice(0,80);
+    if(preP && !q && !L.includes(preP) && doseFor(preP)===drug) L.unshift(preP);
+    g("cBrand").innerHTML='<option value="">— não especificar —</option>'+L.map(p=>`<option value="${esc(p.id)}">${esc(p.nome)} — ${esc(p.laboratorio)}</option>`).join("")+(total>80?`<option disabled>… ${nf(total-80)} outros: refine a busca</option>`:"");
+    if(keep && L.some(p=>p.id===keep)) g("cBrand").value=keep; else if(preP && !q && L.includes(preP) && !g("cBrand").dataset.touched) g("cBrand").value=preP.id;
+    g("cBrandInfo").innerHTML = total? nf(total)+" produto(s) com este princípio ativo na base." : "Nenhum produto encontrado.";
+  }
+
+  function read(){
+    return {
+      grupo:grupo(), modo:g("cModo").value, dose:numBR(g("cDose").value), intervalo:numBR(g("cInt").value), dias:Math.round(numBR(g("cDias").value)),
+      peso:numBR(g("cPeso").value), idadeMeses:idadeMeses(),
+      ap:{tipo:g("cTipo").value, conc:numBR(g("cConc").value), gotasPorMl:numBR(g("cGotas").value), partir:g("cPartir").checked, pack:numBR(g("cPack").value)}
+    };
+  }
+  function recalc(){
+    const i=read();
+    const idadeAnos=i.idadeMeses>=0?i.idadeMeses/12:NaN;
+    const cc=crcl(idadeAnos,i.peso,numBR(g("cCrea").value),g("cSexo").value);
+    g("cCrcl").textContent = isFinite(cc)?"Depuração de creatinina estimada (Cockcroft-Gault): "+cc.toFixed(0)+" mL/min.":"Informe idade (≥ 18 anos), peso, sexo e creatinina.";
+    i.crcl=isFinite(cc)?cc:-1;
+    const out=g("cOut"), r=calcDose(drug,i);
+    if(!r.ok){ out.innerHTML=`<div class="rx empty-rx"><div class="rx-h">Resultado</div><p>${esc(r.erro)}</p></div>`; return; }
+    const brandId=g("cBrand").value, bp=brandId?BY_ID.get(brandId):null;
+    const apRot=drug.apres.find(x=>x.id===g("cAp").value)?.rot || (g("cTipo").value==="comp"?"comprimido ":"líquido ")+g("cConc").value.replace(".",",")+(g("cTipo").value==="comp"?" mg":" mg/mL");
+    const grp=i.grupo==="ped"?"criança/adolescente":"adulto";
+    const calcTxt = i.modo==="fixa" ? "dose fixa de "+fmt(i.dose)+" mg" : fmt(i.dose)+" mg/kg/"+(r.nativa==="dose"?"dose":"dia")+" × "+fmt(i.peso)+" kg";
+    const posol = `Tomar ${fmt(r.qty)} ${r.unidade} (${fmt(r.entregue)} mg) por via oral a cada ${i.intervalo} horas (${r.dosesDia}×/dia), por ${i.dias} dia${i.dias===1?"":"s"}.`;
+    const totalLn = `Total do tratamento: ${r.totalTxt}${r.emb?` → ${r.emb.n} ${r.emb.un}`:""}.`;
+    const idt=g("cId").value.trim();
+    const txt=[idt?"Paciente: "+idt:"", drug.nome+" — "+apRot+(bp?" ("+bp.nome+", "+bp.laboratorio+")":""), posol, totalLn, "Cálculo: "+calcTxt+" → dose-alvo "+fmt(r.alvo)+" mg.", "Calculado no BulaLivre — conferir antes de prescrever."].filter(Boolean).join("\n");
+    const al=r.alertas.concat(drug.notas.map(t=>({n:"info",t})));
+    const worst=r.alertas.some(a=>a.n==="perigo");
+    const INF=(DATA.info||[]).find(gp=>gp.chaves.some(c=>drug.chaves.includes(c)));
+    out.innerHTML=`<div class="rx${worst?" rx-bad":""}">
+      <div class="rx-h">Prescrição calculada <small>${grp}</small></div>
+      ${idt?`<div class="print-only rx-id">Paciente: ${esc(idt)}</div>`:""}
+      <div class="rx-big">${fmt(r.qty)} <span>${r.unidade}</span></div>
+      <div class="rx-line">a cada <b>${i.intervalo} h</b> (${r.dosesDia}×/dia) por <b>${i.dias} dia${i.dias===1?"":"s"}</b></div>
+      <div class="rx-sub">${esc(drug.nome)} · ${esc(apRot)}${bp?`<br><a href="${hMed(bp)}">${esc(bp.nome)}</a> — ${esc(bp.laboratorio)}`:""}</div>
+      <table class="rx-t">
+        <tr><td>Dose-alvo</td><td>${fmt(r.alvo)} mg <small>(${esc(calcTxt)})</small></td></tr>
+        <tr><td>Dose administrada</td><td>${fmt(r.entregue)} mg ${Math.abs(r.desvio)>0.5?`<small>(${r.desvio>0?"+":""}${r.desvio.toFixed(0)}% do alvo)</small>`:""}</td></tr>
+        <tr><td>Dose diária</td><td>${fmt(r.dia)} mg${r.kgDia?` <small>(${fmt(r.kgDia)} mg/kg/dia)</small>`:""}</td></tr>
+        <tr><td>Total</td><td>${esc(r.totalTxt)}${r.emb?`<br><b>${r.emb.n} ${esc(r.emb.un)}</b>`:""}</td></tr>
+      </table>
+      ${al.map(a=>`<div class="al al-${a.n}">${a.n==="perigo"?"⛔":a.n==="aviso"?"⚠️":"ℹ️"} ${esc(a.t)}</div>`).join("")}
+      <button class="rx-mini noprint" id="cMini" type="button"><span>${fmt(r.qty)} ${r.unidade} · ${i.intervalo} h · ${i.dias} d</span><b>ver resultado ↓</b></button>
+      <div class="rx-btns noprint"><button class="btn pri" id="cCopy">Copiar texto</button><button class="btn" id="cPrint">Imprimir</button></div>
+      <div class="print-only rx-date">Emitido em ${new Date().toLocaleDateString("pt-BR")} · calculado no BulaLivre — conferir antes de prescrever.</div>
+    </div>
+    ${INF?`<details class="opt noprint"><summary>Efeitos colaterais e cuidados (informação geral)</summary><div class="blk"><ul>${(INF.efeitos||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul><ul>${(INF.cuidados||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></details>`:""}
+    <div class="alert info noprint">Ferramenta de <b>apoio ao cálculo</b>: não substitui o julgamento clínico. As doses de referência precisam ser validadas e a decisão e a conferência final são do prescritor.</div>`;
+    g("cCopy").onclick=()=>{
+      const done=()=>toast("Texto copiado");
+      if(navigator.clipboard) navigator.clipboard.writeText(txt).then(done,()=>fallback()); else fallback();
+      function fallback(){ const t=document.createElement("textarea"); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy");done();}catch(e){toast("Não foi possível copiar");} t.remove(); }
+    };
+    g("cPrint").onclick=()=>window.print();
+    g("cMini").onclick=()=>{ const r0=g("cOut").querySelector(".rx").getBoundingClientRect(); window.scrollTo({top:window.scrollY+r0.top-70,behavior:"smooth"}); };
+  }
+
+  dsel.onchange=()=>{ g("cBrandQ").value=""; delete g("cBrand").dataset.touched; loadDrug(); recalc(); };
+  g("cModo").onchange=()=>{ modeDefaults(); recalc(); };
+  g("cAp").onchange=()=>{ loadAp(); recalc(); };
+  g("cTipo").onchange=()=>{ tipoUI(); recalc(); };
+  g("cBrandQ").oninput=()=>{ brandList(); };
+  g("cBrand").onchange=()=>{ g("cBrand").dataset.touched=1; recalc(); };
+  g("cDose").oninput=()=>{ dirty=true; recalc(); };
+  const regroup=()=>{
+    const gr=grupo(), cur=g("cModo").value;
+    // troca a base padrão ao mudar de adulto/criança, se o usuário ainda não mexeu na dose
+    if(!dirty){ g("cModo").value=gr==="ped"?"kg":"fixa"; if(g("cModo").value!==cur) modeDefaults(); }
+    intervals(); recalc();
+  };
+  ["cIdade","cIdU","cPeso"].forEach(id=>{ g(id).oninput=regroup; g(id).onchange=regroup; });
+  ["cInt","cDias","cConc","cGotas","cPack","cPartir","cSexo","cCrea","cId"].forEach(id=>{ g(id).oninput=recalc; g(id).onchange=recalc; });
+
+  loadDrug(); recalc();
 }
 
 /* ---------- dados ---------- */
