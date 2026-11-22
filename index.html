@@ -231,6 +231,13 @@
   .ph{margin:12px 0 2px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--brand)}
   .ph:first-child{margin-top:4px}
   .cin dt{color:var(--muted)}.cin dd{margin:0}
+  .labbox{margin:0 0 12px}
+  .hero .labbox{margin:10px auto 0;max-width:620px;width:100%}
+  .hero .labbox .sfield{min-height:46px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+  .page .labbox .sfield{background:var(--surface);border-color:var(--line)}
+  .lx{border:0;background:transparent;color:inherit;font-size:20px;line-height:1;width:30px;height:30px;border-radius:50%;padding:0;margin-left:auto}
+  .lx:hover{background:var(--brand-soft);color:var(--brand)}
+  .lx[hidden]{display:none}
   .print-only{display:none}
   .rx-mini{display:none}
   .topsearch .sfield{flex-wrap:nowrap}
@@ -327,7 +334,9 @@ function buildIndex(){
   };
   PRODS.forEach(p=>{
     p._h = norm([p.nome,p.pa,p.laboratorio,p.classe,p.cat,(p.sintomas||[]).join(" ")].join(" | "));
-    p._n = norm(p.nome);
+    p._n = norm(p.nome); p._pn = norm(p.pa); p._ln = norm(p.laboratorio);
+    const tk=x=>x.split(/[^a-z0-9]+/).filter(Boolean);
+    p._tn=tk(p._n); p._tl=tk(p._ln); p._tp=tk(p._pn);
     let id = slug(p.nome)+(p.laboratorio?"--"+slug(p.laboratorio).slice(0,24):"");
     if(BY_ID.has(id)){ let i=2; while(BY_ID.has(id+"-"+i)) i++; id+="-"+i; }
     p.id=id; BY_ID.set(id,p);
@@ -347,10 +356,30 @@ function rank(list,q,key){
   return list.map(x=>{const n=key(x);return [n.startsWith(nq)?0:(n.split(/\s+/).some(w=>w.startsWith(nq))?1:2),x];})
              .sort((a,b)=>a[0]-b[0]||(key(a[1])<key(b[1])?-1:key(a[1])>key(b[1])?1:0)).map(x=>x[1]);
 }
-function searchProds(q,tipo,nameOnly){
+function labOK(p,lab){ const lw=norm(lab).split(/\s+/).filter(Boolean); return lw.every(w=>p._ln.includes(w)); }
+function searchProds(q,tipo,nameOnly,lab){
   const words=norm(q).split(/\s+/).filter(Boolean);
-  const list=PRODS.filter(p=>(!tipo||p.tipo===tipo) && words.every(w=>(nameOnly?p._n+" "+norm(p.pa):p._h).includes(w)));
-  return rank(list,q,p=>p._n);
+  // nameOnly: só nome, princípio ativo e laboratório (sem classe/sintomas) — usado nas sugestões
+  const list=PRODS.filter(p=>(!tipo||p.tipo===tipo) && (!lab||labOK(p,lab)) && words.every(w=>(nameOnly?p._n+" "+p._pn+" "+p._ln:p._h).includes(w)));
+  return rankProds(list,words);
+}
+// Relevância por palavra: nome exato < prefixo no nome < laboratório exato < ativo/prefixo de lab < trecho < resto
+function rankProds(list,words){
+  if(!words.length) return list;
+  const score=p=>{
+    let t=0;
+    for(const w of words){
+      if(p._tn.includes(w)) t+=0;
+      else if(p._tn.some(x=>x.startsWith(w))) t+=1;
+      else if(p._tl.includes(w)) t+=1.5;
+      else if(p._tp.includes(w)||p._tp.some(x=>x.startsWith(w))||p._tl.some(x=>x.startsWith(w))) t+=2;
+      else if(p._n.includes(w)||p._pn.includes(w)||p._ln.includes(w)) t+=3;
+      else t+=4;
+    }
+    if(p._n.startsWith(words[0])) t-=0.5;   // nome que começa pela busca vem antes
+    return t;
+  };
+  return list.map(p=>[score(p),p]).sort((a,b)=>a[0]-b[0]||(a[1]._n<b[1]._n?-1:a[1]._n>b[1]._n?1:(a[1]._ln<b[1]._ln?-1:1))).map(x=>x[1]);
 }
 function searchAgg(arr,q){
   const words=norm(q).split(/\s+/).filter(Boolean);
@@ -393,9 +422,13 @@ function route(){
   const q = view==="busca" ? (params.get("q")||"") : "";
   lastQ=q;
   mountSearch($("topSearch"),{val:q,ph:"Buscar medicamento, sintoma…"});
-  const hs=$("heroSearch"); if(hs) mountSearch(hs,{ph:"Digite seus sintomas ou o nome do remédio",hero:true,multi:true});
+  let labInp=null; const hl0=$("heroLab");
+  if(hl0) labInp=mountLabField(hl0,"",{ph:"Laboratório (opcional)",onEnter:()=>{ const h=$("heroSearch"); if(h&&h._submit) h._submit(); }});
+  const hs=$("heroSearch"); if(hs) mountSearch(hs,{ph:"Digite seus sintomas ou o nome do remédio",hero:true,multi:true,labInput:labInp});
+  const rl=$("resLab");
+  if(rl) mountLabField(rl,params.get("lab")||"",{ph:"Filtrar por laboratório",apply:v=>{ location.hash=href("busca",{q:params.get("q")||"",aba:params.get("aba")||"",tipo:params.get("tipo")||"",lab:v}); }});
   if(view==="calculadora") initCalc(parts[1]||"",params);
-  const ss=$("symSearch"); if(ss) mountSearch(ss,{ph:"Adicionar sintoma…",multi:true,live:true,chips:symNames(params),focus:!!params.get("f")});
+  const ss=$("symSearch"); if(ss) mountSearch(ss,{ph:"Adicionar sintoma…",multi:true,live:true,chips:symNames(params),lab:params.get("lab")||"",focus:!!params.get("f")});
 }
 window.addEventListener("hashchange",route);
 
@@ -427,7 +460,8 @@ function mountSearch(box,o){
     ${o.hero?'<button class="sgo" type="submit">Buscar</button>':''}</form><div class="sug"></div>`;
   const form=box.querySelector("form"), inp=box.querySelector("input"), sug=box.querySelector(".sug");
   let sel=-1, tm;
-  const toSymptoms=()=>{ location.hash=chips.length?href("sintomas",{s:chips.join("|"),f:o.live?1:""}):"#/"; };
+  const labVal=()=>o.labInput?o.labInput.value.trim():(o.lab||"");
+  const toSymptoms=()=>{ location.hash=chips.length?href("sintomas",{s:chips.join("|"),f:o.live?1:"",lab:labVal()}):"#/"; };
   const drawChips=()=>{
     form.querySelectorAll(".sc").forEach(x=>x.remove());
     chips.forEach(n=>{
@@ -455,8 +489,9 @@ function mountSearch(box,o){
       const parts=splitSymptoms(t)||(resolveSymptom(t,true)?[resolveSymptom(t,true)]:null);
       if(parts){ location.hash=href("sintomas",{s:parts.map(e=>e.nome).join("|")}); inp.blur(); return; }
     }
-    location.hash=href("busca",{q:t}); inp.blur();
+    location.hash=href("busca",{q:t,lab:labVal()}); inp.blur();
   };
+  box._submit=submit;
   form.onsubmit=e=>{
     e.preventDefault();
     const cur=sug.querySelector("a.sel");
@@ -511,6 +546,34 @@ function mountSearch(box,o){
 }
 document.addEventListener("click",e=>{ document.querySelectorAll(".sug.open").forEach(s=>{ if(!s.parentElement.contains(e.target)) s.classList.remove("open"); }); });
 
+/* campo "Laboratório" com autocomplete. o.apply(v): aplica o filtro (resultados); o.onEnter: Enter na home */
+function mountLabField(box,val,o){
+  o=o||{};
+  box.innerHTML=`<div class="sfield">${ICON.building}<input type="search" enterkeyhint="search" aria-label="Laboratório" placeholder="${o.ph||"Laboratório"}" value="${esc(val)}"><button type="button" class="lx" aria-label="Limpar laboratório" ${val?"":"hidden"}>×</button></div><div class="sug"></div>`;
+  const inp=box.querySelector("input"), sug=box.querySelector(".sug"), lx=box.querySelector(".lx");
+  let tm;
+  const draw=()=>{
+    const q=inp.value.trim(); lx.hidden=!q;
+    if(norm(q).length<2){ sug.classList.remove("open"); return; }
+    const L=searchAgg(LABS,q).slice(0,8);
+    if(!L.length){ sug.classList.remove("open"); return; }
+    sug.innerHTML="<h6>Laboratórios</h6>"+L.map(e=>`<a href="#" data-lab="${esc(e.nome)}"><span>${hl(e.nome,q)}</span><small>${nf(e.prods.length)} prod.</small></a>`).join("");
+    sug.classList.add("open");
+  };
+  inp.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(draw,100);});
+  inp.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){ sug.classList.remove("open"); return; }
+    if(e.key==="Enter"){ e.preventDefault(); sug.classList.remove("open"); if(o.apply) o.apply(inp.value.trim()); else if(o.onEnter) o.onEnter(); }
+  });
+  sug.addEventListener("click",e=>{
+    const a=e.target.closest("a"); if(!a) return; e.preventDefault();
+    inp.value=a.dataset.lab; lx.hidden=false; sug.classList.remove("open");
+    if(o.apply) o.apply(inp.value);
+  });
+  lx.onclick=()=>{ inp.value=""; lx.hidden=true; if(o.apply) o.apply(""); else inp.focus(); };
+  return inp;
+}
+
 /* ---------- componentes ---------- */
 function tagOf(p){ const [l,c]=TIPO[p.tipo||""]||TIPO[""]; return `<span class="tag ${c}">${l}</span>`; }
 function prodItem(p,q){
@@ -546,6 +609,7 @@ function viewHome(){
       <h1>Consulta de medicamentos</h1>
       <p>Pesquise por medicamento ou some seus sintomas — ex.: <i>dor de cabeça</i> + <i>febre</i>.</p>
       <div class="sbox" id="heroSearch"></div>
+      <div class="sbox labbox" id="heroLab"></div>
       <a class="calcbtn" href="#/calculadora">🧮 Calculadora de dose <small>para profissionais</small></a>
       <div class="explore">Explorar:
         <a href="${href("busca",{aba:"produtos"})}">Produtos</a> ·
@@ -557,23 +621,26 @@ function viewHome(){
 
 const ABAS=[["todos","Todos"],["produtos","Produtos"],["substancias","Substâncias"],["patologias","Patologias"],["laboratorios","Laboratórios"]];
 function viewSearch(params){
-  const q=(params.get("q")||"").trim();
+  const q=(params.get("q")||"").trim(), lab=(params.get("lab")||"").trim();
   let aba=params.get("aba")||"todos";
   if(!ABAS.some(a=>a[0]===aba)) aba="todos";
   if(!q && aba==="todos") aba="produtos";
+  if(lab) aba="produtos";            // com laboratório, a lista é sempre de produtos
   const tipo=params.get("tipo")||"";
   const page=Math.max(1,parseInt(params.get("p"))||1);
-  const P=searchProds(q,aba==="produtos"?tipo:""), S=searchAgg(SUBS,q), L=searchAgg(LABS,q), T=searchAgg(PATS,q);
+  const P=searchProds(q,aba==="produtos"?tipo:"",false,lab);
+  const S=lab?[]:searchAgg(SUBS,q), L=lab?[]:searchAgg(LABS,q), T=lab?[]:searchAgg(PATS,q);
   const cnt={todos:P.length+S.length+L.length+T.length,produtos:P.length,substancias:S.length,patologias:T.length,laboratorios:L.length};
-  if(aba==="produtos" && tipo){ cnt.produtos=searchProds(q).length; }
-  document.title=(q?q+" — ":"")+"Resultados · BulaLivre";
-  const tabs=`<div class="tabs" role="tablist">${ABAS.filter(a=>a[0]==="todos"?!!q:true).map(([k,l])=>
-    `<a class="tab${k===aba?" on":""}" href="${href("busca",{q,aba:k==="todos"?"":k})}">${l}<i>${nf(cnt[k])}</i></a>`).join("")}</div>`;
+  if(aba==="produtos" && tipo){ cnt.produtos=searchProds(q,"",false,lab).length; }
+  document.title=(q?q+" — ":"")+(lab?lab+" — ":"")+"Resultados · BulaLivre";
+  const hb=o=>href("busca",Object.assign({q,lab},o));
+  const tabs=`<div class="tabs" role="tablist">${ABAS.filter(a=>lab?a[0]==="produtos":(a[0]==="todos"?!!q:true)).map(([k,l])=>
+    `<a class="tab${k===aba?" on":""}" href="${hb({aba:k==="todos"?"":k})}">${l}<i>${nf(cnt[k])}</i></a>`).join("")}</div>`;
   let body="";
   if(aba==="todos"){
     if(!cnt.todos) body=emptyMsg(q);
     else{
-      const sec=(title,arr,aby,fn)=>arr.length?`<section class="sec"><h3>${title}<a href="${href("busca",{q,aba:aby})}">ver todos (${nf(arr.length)})</a></h3><div class="list">${arr.slice(0,5).map(fn).join("")}</div></section>`:"";
+      const sec=(title,arr,aby,fn)=>arr.length?`<section class="sec"><h3>${title}<a href="${hb({aba:aby})}">ver todos (${nf(arr.length)})</a></h3><div class="list">${arr.slice(0,5).map(fn).join("")}</div></section>`:"";
       body=sec("Produtos",P,"produtos",p=>prodItem(p,q))+sec("Princípios ativos",S,"substancias",e=>aggItem(e,"substancia",q))+
            sec("Patologias / sintomas",T,"patologias",e=>aggItem(e,"patologia",q))+sec("Laboratórios",L,"laboratorios",e=>aggItem(e,"laboratorio",q));
     }
@@ -582,12 +649,14 @@ function viewSearch(params){
     const kind={substancias:"substancia",patologias:"patologia",laboratorios:"laboratorio"}[aba];
     const fn= aba==="produtos" ? (p=>prodItem(p,q)) : (e=>aggItem(e,kind,q));
     const filt = aba==="produtos" ? `<div class="filters"><span>Tipo:</span>${[["","Todos"],["mip","Isento de prescrição"],["presc","Sob prescrição"],["ctrl","Controlado"]].map(([v,l])=>
-      `<a class="chip${tipo===v?" on":""}" href="${href("busca",{q,aba:"produtos",tipo:v})}">${l}</a>`).join("")}</div>` : "";
+      `<a class="chip${tipo===v?" on":""}" href="${hb({aba:"produtos",tipo:v})}">${l}</a>`).join("")}</div>` : "";
     body = filt + (arr.length ? `<div class="list">${arr.slice(PAGE*(page-1),PAGE*page).map(fn).join("")}</div>`+
-      pager(arr.length,page,n=>href("busca",{q,aba,tipo,p:n})) : emptyMsg(q));
+      pager(arr.length,page,n=>hb({aba,tipo,p:n})) : emptyMsg(q));
   }
-  return `<div class="page"><h1 class="title">${q?`Resultados para “${esc(q)}”`:"Explorar"}</h1>
-    <div class="sub">${q?"Medicamentos, princípios ativos, patologias e laboratórios.":"Navegue pela base completa."}</div>${tabs}${body}${noteBox()}</div>`;
+  const ttl = q&&lab ? `“${esc(q)}” · ${esc(lab)}` : q ? `Resultados para “${esc(q)}”` : lab ? esc(lab) : "Explorar";
+  const sub = lab ? "Produtos filtrados por laboratório." : (q?"Medicamentos, princípios ativos, patologias e laboratórios.":"Navegue pela base completa.");
+  return `<div class="page"><h1 class="title">${ttl}</h1>
+    <div class="sub">${sub}</div><div class="sbox labbox" id="resLab"></div>${tabs}${body}${noteBox()}</div>`;
 }
 function emptyMsg(q){
   return `<div class="empty">Nada encontrado${q?` para “<b>${esc(q)}</b>”`:""}.<br>Tente um sintoma (<i>febre</i>, <i>azia</i>, <i>cólica</i>), um remédio ou um laboratório.</div>`;
@@ -631,7 +700,7 @@ function viewSintomas(params){
   const builder=`<div class="sbox symbox" id="symSearch"></div>`;
   if(!names.length) return `<div class="page"><h1 class="title">Buscar por sintomas</h1>
     <div class="sub">Adicione um ou mais sintomas para ver os medicamentos indicados.</div>${builder}${noteBox()}</div>`;
-  const tipo=params.get("tipo")||"";
+  const tipo=params.get("tipo")||"", lab=(params.get("lab")||"").trim();
   const aba=params.get("aba")==="produtos"?"produtos":"substancias";
   const page=Math.max(1,parseInt(params.get("p"))||1);
   const ents=names.map(n=>PAT_MAP.get(norm(n)));
@@ -639,7 +708,7 @@ function viewSintomas(params){
   const sets=ents.map(e=>new Set(e.prods));
   // produtos: quantos dos sintomas escolhidos cada um cobre
   const cnt=new Map();
-  ents.forEach(e=>e.prods.forEach(p=>{ if(!tipo||p.tipo===tipo) cnt.set(p,(cnt.get(p)||0)+1); }));
+  ents.forEach(e=>e.prods.forEach(p=>{ if((!tipo||p.tipo===tipo)&&(!lab||labOK(p,lab))) cnt.set(p,(cnt.get(p)||0)+1); }));
   const byName=(a,b)=>a._n<b._n?-1:a._n>b._n?1:0;
   const prods=[...cnt].map(([p,c])=>({p,c})).sort((a,b)=>b.c-a.c||byName(a.p,b.p));
   // princípios ativos (só produtos de 1 substância, para a cobertura ser fiel)
@@ -653,9 +722,9 @@ function viewSintomas(params){
   const sarr=[...subs.values()].filter(s=>s.e).sort((a,b)=>b.c-a.c||(b.np-a.np));
   const fullS=sarr.filter(s=>s.c===n).length, fullP=prods.filter(x=>x.c===n).length;
   const cntA={substancias:sarr.length,produtos:prods.length};
-  const tab=(k,l)=>`<a class="tab${k===aba?" on":""}" href="${href("sintomas",{s:names.join("|"),aba:k==="substancias"?"":k,tipo})}">${l}<i>${nf(cntA[k])}</i></a>`;
+  const tab=(k,l)=>`<a class="tab${k===aba?" on":""}" href="${href("sintomas",{s:names.join("|"),aba:k==="substancias"?"":k,tipo,lab})}">${l}<i>${nf(cntA[k])}</i></a>`;
   const filt=`<div class="filters"><span>Tipo:</span>${[["","Todos"],["mip","Isento de prescrição"],["presc","Sob prescrição"],["ctrl","Controlado"]].map(([v,l])=>
-    `<a class="chip${tipo===v?" on":""}" href="${href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo:v})}">${l}</a>`).join("")}</div>`;
+    `<a class="chip${tipo===v?" on":""}" href="${href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo:v,lab})}">${l}</a>`).join("")}</div>`;
   const cov=(c)=>`<span class="cov${c===n?" full":""}" title="Cobre ${c} de ${n} sintomas">${c}/${n}</span>`;
   const arr = aba==="substancias" ? sarr : prods;
   const rows = arr.slice(PAGE*(page-1),PAGE*page).map(x=>{
@@ -668,6 +737,7 @@ function viewSintomas(params){
     }
     return prodItem(x.p,"").replace('<span class="go">',(n>1?cov(x.c):"")+'<span class="go">');
   }).join("");
+  const labChip = lab ? `<div class="filters"><span>Laboratório:</span><a class="chip on" href="${href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo})}" title="Remover filtro">${esc(lab)} ✕</a></div>` : "";
   let msg="";
   if(n>1){
     const full = aba==="substancias"?fullS:fullP;
@@ -676,8 +746,8 @@ function viewSintomas(params){
       : `<div class="sub">Nenhum${aba==="substancias"?" princípio ativo":" produto"} cadastrado cobre todos os ${n} sintomas juntos — mostrando os que cobrem parte deles. Vários sintomas ao mesmo tempo podem pedir avaliação médica.</div>`;
   }else msg=`<div class="sub">${nf(cntA[aba])} ${aba==="substancias"?"princípios ativos":"produtos"} relacionados.</div>`;
   return `<div class="page"><h1 class="title">Medicamentos para ${esc(names.join(" + ").toLowerCase())}</h1>${builder}
-    ${msg}<div class="tabs">${tab("substancias","Princípios ativos")}${tab("produtos","Produtos")}</div>${filt}
-    ${arr.length?`<div class="list">${rows}</div>${pager(arr.length,page,p=>href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo,p}))}`:emptyMsg("")}
+    ${msg}${labChip}<div class="tabs">${tab("substancias","Princípios ativos")}${tab("produtos","Produtos")}</div>${filt}
+    ${arr.length?`<div class="list">${rows}</div>${pager(arr.length,page,p=>href("sintomas",{s:names.join("|"),aba:aba==="substancias"?"":aba,tipo,lab,p}))}`:emptyMsg("")}
     ${noteBox()}</div>`;
 }
 function symNames(params){
