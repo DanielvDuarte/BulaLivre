@@ -791,7 +791,9 @@ function viewDetail(id){
       <div class="blk"><h2>Bula</h2><a class="btn pri" href="${bulaUrl(p)}" target="_blank" rel="noopener noreferrer">📄 Ver / baixar bula na ANVISA</a>
         <div class="cuso" style="margin-top:8px">Abre o Bulário Eletrônico oficial com o nome do produto preenchido: clique em <b>Consultar</b> e baixe a bula do paciente ou do profissional (PDF). Requer internet.</div></div>
       ${doseFor(p)&&CIN[doseFor(p).id]?`<div class="blk"><h2>Dinâmica e cinética (referência)</h2>${cinHtml(doseFor(p).id)}</div>`:""}
-      ${doseFor(p)?`<div class="blk"><a class="btn pri" href="#/calculadora/${doseFor(p).id}?p=${encodeURIComponent(p.id)}">🧮 Calcular dose deste medicamento</a></div>`:""}
+      <div class="blk">${doseFor(p)
+        ? `<a class="btn pri" href="#/calculadora/${doseFor(p).id}?p=${encodeURIComponent(p.id)}">🧮 Calcular dose deste medicamento</a>`
+        : `<a class="btn pri" href="#/calculadora/livre?p=${encodeURIComponent(p.id)}">🧮 Calcular dose (cálculo manual)</a><div class="cuso" style="margin-top:8px">Este princípio ativo ainda não tem doses de referência cadastradas: no cálculo manual você informa a dose prescrita e o app faz a conta (sem faixas nem alertas de segurança).</div>`}</div>
       ${groups.length?"":`<div class="blk"><p class="muted">Ainda não temos resumo de uso e efeitos colaterais para este princípio ativo. Consulte a bula do produto.</p></div>`}
       ${groups.length?`<div class="alert info">Informações gerais sobre o princípio ativo, em linguagem simples. Nem todo efeito listado acontece com todo mundo, e a lista não é completa: leia a <b>bula do produto</b> e fale com seu médico ou farmacêutico.</div>`:""}
     </article>
@@ -886,7 +888,72 @@ const DOSES = [
    {id:"s40",rot:"suspensão oral 200 mg/5 mL (40 mg/mL)",tipo:"susp",conc:40,pack:80},
    {id:"c250",rot:"comprimido 250 mg",tipo:"comp",conc:250,pack:20},
    {id:"c400",rot:"comprimido 400 mg",tipo:"comp",conc:400,pack:20},
-   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:10}]}
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:10}]},
+ {id:"ambroxol",nome:"Ambroxol",chaves:["ambroxol"],uso:"Mucolítico/expectorante (tosse com catarro).",
+  ped:{modo:"dia",min:1.2,max:1.6,padrao:1.5}, ad:{min:15,max:60,padrao:30},
+  int:{ped:[8,12],ad:[8,12],pedPad:12,adPad:8}, dias:5, maxDiaMg:120, idadeMinMeses:24,
+  notas:["Em crianças a bula costuma dar doses por faixa etária: confira. Menores de 2 anos só com orientação médica.","Beba bastante líquido durante o tratamento."],
+  apres:[
+   {id:"s3",rot:"xarope pediátrico 15 mg/5 mL (3 mg/mL)",tipo:"susp",conc:3,pack:120},
+   {id:"s6",rot:"xarope adulto 30 mg/5 mL (6 mg/mL)",tipo:"susp",conc:6,pack:120},
+   {id:"c30",rot:"comprimido 30 mg",tipo:"comp",conc:30,pack:20}]},
+ {id:"omeprazol",nome:"Omeprazol",chaves:["omeprazol"],uso:"Inibidor da bomba de prótons (azia, refluxo, gastrite, úlcera).",
+  ped:{modo:"dia",min:0.7,max:3.3,padrao:1}, ad:{min:10,max:40,padrao:20},
+  int:{ped:[24,12],ad:[24,12],pedPad:24,adPad:24}, dias:28, maxDiaMg:80,
+  notas:["Tomar em jejum, cerca de 30 min antes do café da manhã. Não mastigar as cápsulas.","Doses acima de 40 mg/dia são para indicações específicas (ex.: Zollinger-Ellison).","Uso prolongado exige acompanhamento (magnésio, vitamina B12)."],
+  apres:[
+   {id:"c10",rot:"cápsula 10 mg",tipo:"comp",conc:10,pack:28},
+   {id:"c20",rot:"cápsula 20 mg",tipo:"comp",conc:20,pack:28},
+   {id:"c40",rot:"cápsula 40 mg",tipo:"comp",conc:40,pack:28}]},
+ {id:"domperidona",nome:"Domperidona",chaves:["domperidona"],uso:"Procinético/antiemético (náusea, vômito, má digestão).",
+  ped:{modo:"dose",min:0.25,max:0.25,padrao:0.25}, ad:{min:10,max:10,padrao:10},
+  int:{ped:[8],ad:[8],pedPad:8,adPad:8}, dias:5, maxDiaMg:30, maxDiaMgKg:0.75, maxDoseMg:10,
+  notas:["Risco de prolongamento do intervalo QT e arritmia: usar a menor dose pelo menor tempo (em geral até 7 dias).","Cuidado com interações (ex.: cetoconazol, macrolídeos)."],
+  apres:[
+   {id:"s1",rot:"suspensão oral 1 mg/mL",tipo:"susp",conc:1,pack:100},
+   {id:"c10",rot:"comprimido 10 mg",tipo:"comp",conc:10,pack:30}]},
+ {id:"metoclopramida",nome:"Metoclopramida",chaves:["metoclopramida"],uso:"Antiemético/procinético (náusea e vômito).",
+  ped:{modo:"dose",min:0.1,max:0.15,padrao:0.1}, ad:{min:5,max:10,padrao:10},
+  int:{ped:[8],ad:[8],pedPad:8,adPad:8}, dias:3, maxDiaMg:30, maxDiaMgKg:0.5, maxDoseMg:10, idadeMinMeses:12,
+  notas:["Risco de reações extrapiramidais (movimentos involuntários), maior em crianças e jovens; evitar uso prolongado (em geral até 5 dias).","Contraindicada em crianças menores de 1 ano (ver bula)."],
+  apres:[
+   {id:"g4",rot:"gotas 4 mg/mL",tipo:"gotas",conc:4,gotasPorMl:20,pack:10},
+   {id:"s1",rot:"solução oral 1 mg/mL (5 mg/5 mL)",tipo:"susp",conc:1,pack:100},
+   {id:"c10",rot:"comprimido 10 mg",tipo:"comp",conc:10,pack:20}]},
+ {id:"claritromicina",nome:"Claritromicina",chaves:["claritromicina"],uso:"Antibiótico (macrolídeo).",
+  ped:{modo:"dia",min:15,max:15,padrao:15}, ad:{min:250,max:500,padrao:500},
+  int:{ped:[12],ad:[12],pedPad:12,adPad:12}, dias:7, maxDiaMg:1000, idadeMinMeses:6, renal:true,
+  notas:["Muitas interações medicamentosas (CYP3A4); risco de prolongamento do intervalo QT.","Validade da suspensão após reconstituição: ver bula do produto."],
+  apres:[
+   {id:"s25",rot:"suspensão oral 125 mg/5 mL (25 mg/mL)",tipo:"susp",conc:25,pack:60},
+   {id:"s50",rot:"suspensão oral 250 mg/5 mL (50 mg/mL)",tipo:"susp",conc:50,pack:60},
+   {id:"c250",rot:"comprimido 250 mg",tipo:"comp",conc:250,pack:14},
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:14}]},
+ {id:"cefuroxima",nome:"Cefuroxima",chaves:["cefuroxima"],uso:"Antibiótico (cefalosporina de 2ª geração).",
+  ped:{modo:"dose",min:10,max:15,padrao:15}, ad:{min:250,max:500,padrao:250},
+  int:{ped:[12],ad:[12],pedPad:12,adPad:12}, dias:7, maxDiaMg:1000, maxDoseMg:500, idadeMinMeses:3, renal:true,
+  notas:["Cuidado em alergia a penicilinas/cefalosporinas.","A dose pediátrica varia conforme a indicação (otite, faringite): confira a bula."],
+  apres:[
+   {id:"s50",rot:"suspensão oral 250 mg/5 mL (50 mg/mL)",tipo:"susp",conc:50,pack:50},
+   {id:"c250",rot:"comprimido 250 mg",tipo:"comp",conc:250,pack:10},
+   {id:"c500",rot:"comprimido 500 mg",tipo:"comp",conc:500,pack:10}]},
+ {id:"fluconazol",nome:"Fluconazol",chaves:["fluconazol"],uso:"Antifúngico (candidíase e outras micoses).",
+  ped:{modo:"dia",min:3,max:6,padrao:3}, ad:{min:50,max:400,padrao:150},
+  int:{ped:[24],ad:[24],pedPad:24,adPad:24}, dias:1, maxDiaMg:400, renal:true,
+  notas:["Candidíase vaginal: em geral dose única de 150 mg. A duração varia muito conforme a indicação.","Para crianças, prefira suspensão: use “Outra apresentação” e informe a concentração do produto.","Interações frequentes e risco hepático/QT: revisar medicamentos em uso."],
+  apres:[
+   {id:"c50",rot:"cápsula 50 mg",tipo:"comp",conc:50,pack:10},
+   {id:"c100",rot:"cápsula 100 mg",tipo:"comp",conc:100,pack:10},
+   {id:"c150",rot:"cápsula 150 mg",tipo:"comp",conc:150,pack:1},
+   {id:"c200",rot:"cápsula 200 mg",tipo:"comp",conc:200,pack:10}]},
+ {id:"prednisona",nome:"Prednisona",chaves:["prednisona"],uso:"Corticoide (anti-inflamatório/antialérgico).",
+  ped:{modo:"dia",min:0.5,max:2,padrao:1}, ad:{min:5,max:60,padrao:20},
+  int:{ped:[12,24],ad:[12,24],pedPad:24,adPad:24}, dias:5, maxDiaMg:60,
+  notas:["Em uso prolongado (> 7–14 dias) avaliar desmame; atenção a diabetes, hipertensão e infecções.","Tomar preferencialmente pela manhã, junto à alimentação."],
+  apres:[
+   {id:"c5",rot:"comprimido 5 mg",tipo:"comp",conc:5,pack:20},
+   {id:"c10",rot:"comprimido 10 mg",tipo:"comp",conc:10,pack:20},
+   {id:"c20",rot:"comprimido 20 mg",tipo:"comp",conc:20,pack:10}]}
 ];
 
 /* CALC-ENGINE-START */
@@ -993,9 +1060,14 @@ const LIVRE={id:"livre",nome:"Outro medicamento (cálculo manual)",chaves:[],
   int:{ped:[4,6,8,12,24],ad:[4,6,8,12,24],pedPad:8,adPad:8}, dias:5,
   notas:["Cálculo manual: nenhuma faixa de dose, limite máximo ou alerta de segurança é aplicado a este medicamento."], apres:[]};
 
+// chave do princípio ativo sem o sal/hidratação: "cloridrato de ambroxol" -> "ambroxol"
+function paKey(s){
+  return norm(s).replace(/\b(cloridrato|sulfato|fosfato|succinato|maleato|tartarato|hemitartarato|hemifumarato|acetato|bromidrato|mesilato|besilato|nitrato|citrato|sodica|sodico|monoidratada|monoidratado|triidratada|triidratado|di-hidratada|di-hidratado|dihidratada|potassica)\b/g,"")
+    .replace(/\bde\b/g,"").replace(/\s+/g," ").trim();
+}
 function doseFor(p){
   if(!p||p._subs.length!==1) return null;
-  const s=norm(p._subs[0]);
+  const s=paKey(p._subs[0]);
   return DOSES.find(d=>d.chaves.some(c=>s.startsWith(c)))||null;
 }
 
@@ -1049,9 +1121,9 @@ function viewCalc(){
 function initCalc(drugId,params){
   const g=id=>document.getElementById(id);
   const dsel=g("cDrug");
-  const ALL=DOSES.concat([LIVRE]);
+  const ALL=[...DOSES].sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR")).concat([LIVRE]);
   dsel.innerHTML=ALL.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join("");
-  g("cAvail").innerHTML=`Hoje o app tem <b>${DOSES.length} medicamentos com doses de referência, alertas, dinâmica e cinética</b>. Os dados da ANVISA (que alimentam a consulta) trazem nome, laboratório e princípio ativo, mas <b>não trazem dose, concentração, dinâmica nem cinética</b>. Por isso cada medicamento da calculadora foi cadastrado à mão e precisa ser revisado por um profissional antes de entrar — a lista cresce aos poucos.<br><br>Para <b>qualquer outro medicamento</b> escolha “Outro medicamento (cálculo manual)”: o app faz a conta e escolhe o produto/marca da base, mas <b>sem faixas, limites ou alertas de segurança</b>.`;
+  g("cAvail").innerHTML=`Hoje o app tem <b>${DOSES.length} princípios ativos com doses de referência e alertas</b> (${Object.keys(CIN).length} deles também com dinâmica e cinética), o que cobre ${nf(PRODS.filter(p=>doseFor(p)).length)} dos ${nf(PRODS.length)} produtos da base. Os dados da ANVISA (que alimentam a consulta) trazem nome, laboratório e princípio ativo, mas <b>não trazem dose, concentração, dinâmica nem cinética</b>. Por isso cada medicamento da calculadora foi cadastrado à mão e precisa ser revisado por um profissional antes de entrar — a lista cresce aos poucos.<br><br><b>Todos os produtos</b> podem ser usados no “Outro medicamento (cálculo manual)”: o app faz a conta e escolhe o produto/marca da base, mas <b>sem faixas, limites ou alertas de segurança</b>.`;
   const preP=params.get("p")?BY_ID.get(params.get("p")):null;
   const pre=ALL.find(d=>d.id===drugId)||doseFor(preP)||DOSES[0];
   dsel.value=pre.id;
@@ -1104,14 +1176,14 @@ function initCalc(drugId,params){
   function brandList(){
     const q=norm(g("cBrandQ").value), keep=g("cBrand").value;
     let L = drug===LIVRE
-      ? (q.length>=2 ? PRODS.filter(p=>(p._n+" "+norm(p.laboratorio)+" "+norm(p.pa)).includes(q)) : [])
-      : PRODS.filter(p=>p._subs.length===1 && drug.chaves.some(c=>norm(p._subs[0]).startsWith(c)) && (!q || (p._n+" "+norm(p.laboratorio)).includes(q)));
+      ? (q.length>=2 ? PRODS.filter(p=>(p._n+" "+norm(p.laboratorio)+" "+norm(p.pa)).includes(q)) : (preP?[preP]:[]))
+      : PRODS.filter(p=>p._subs.length===1 && drug.chaves.some(c=>paKey(p._subs[0]).startsWith(c)) && (!q || (p._n+" "+norm(p.laboratorio)).includes(q)));
     L.sort((a,b)=>a._n<b._n?-1:a._n>b._n?1:0);
     const total=L.length; L=L.slice(0,80);
     if(preP && !q && !L.includes(preP) && doseFor(preP)===drug) L.unshift(preP);
     g("cBrand").innerHTML='<option value="">— não especificar —</option>'+L.map(p=>`<option value="${esc(p.id)}">${esc(p.nome)} — ${esc(p.laboratorio)}</option>`).join("")+(total>80?`<option disabled>… ${nf(total-80)} outros: refine a busca</option>`:"");
     if(keep && L.some(p=>p.id===keep)) g("cBrand").value=keep; else if(preP && !q && L.includes(preP) && !g("cBrand").dataset.touched) g("cBrand").value=preP.id;
-    g("cBrandInfo").innerHTML = drug===LIVRE && !q ? "Digite o nome, princípio ativo ou laboratório para buscar qualquer produto da base." : (total? nf(total)+" produto(s) encontrado(s) na base." : "Nenhum produto encontrado.");
+    g("cBrandInfo").innerHTML = drug===LIVRE && !q ? (preP ? "Cálculo manual para <b>"+esc(preP.nome)+"</b> (princípio ativo: "+esc(preP.pa||"não informado")+"). Digite acima para trocar de produto." : "Digite o nome, princípio ativo ou laboratório para buscar qualquer produto da base.") : (total? nf(total)+" produto(s) encontrado(s) na base." : "Nenhum produto encontrado.");
   }
 
   function read(){
