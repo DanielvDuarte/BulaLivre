@@ -97,6 +97,7 @@
         color:#fff;padding:48px 16px 64px;text-align:center;min-height:calc(100vh - 60px - env(safe-area-inset-top));display:flex;flex-direction:column;justify-content:center;align-items:center}
   .hero .sbox{width:100%}
   .explore{margin-top:22px;font-size:13px;opacity:.85}
+  .hero .ver{margin-top:16px;font-size:12px;color:rgba(255,255,255,.72)}.hero .ver b{color:#fff;font-weight:700}
   .explore a{color:#fff;text-decoration:underline;text-underline-offset:3px}
   .hero h1{margin:0 0 8px;font-size:clamp(28px,6vw,44px);letter-spacing:-1px;line-height:1.1}
   .hero p{margin:0 auto 26px;max-width:520px;opacity:.9;font-size:clamp(14px,3.4vw,17px)}
@@ -335,6 +336,8 @@
 let EMBEDDED_DATA = null; /*__EMBED_SLOT__*/
 
 const OFFLINE = EMBEDDED_DATA !== null;
+// Versão do APP (não é a data da base da ANVISA). Suba a cada alteração — ver CHANGELOG.md e CLAUDE.md.
+const APP_VERSION = "1.0.0";
 let DATA = {versao:"—", atualizado_em:"", fonte:"", total:0, produtos:[]};
 const PAGE = 20;
 
@@ -702,6 +705,7 @@ function viewHome(){
         <a href="${href("busca",{aba:"substancias"})}">Princípios ativos</a> ·
         <a href="${href("busca",{aba:"patologias"})}">Patologias</a> ·
         <a href="${href("busca",{aba:"laboratorios"})}">Laboratórios</a></div>
+      <div class="ver">BulaLivre <b>v${APP_VERSION}</b></div>
     </section>`;
 }
 
@@ -1609,7 +1613,7 @@ function afterLoad(){
   DATA.total = DATA.total || PRODS.length;
   const d = DATA.atualizado_em ? new Date(DATA.atualizado_em) : null;
   const quando = d && !isNaN(d) ? d.toLocaleDateString("pt-BR") : (DATA.versao||"—");
-  $("footer").innerHTML = "Fonte: "+esc(DATA.fonte||"ANVISA — Dados Abertos")+" · base de "+esc(quando)+
+  $("footer").innerHTML = "BulaLivre v"+esc(APP_VERSION)+" · Fonte: "+esc(DATA.fonte||"ANVISA — Dados Abertos")+" · base de "+esc(quando)+
     (OFFLINE ? " · <b>cópia offline</b> (para atualizar, baixe de novo no site)" : "");
   if(OFFLINE) $("btnUpdate").style.display="none";
   route();
