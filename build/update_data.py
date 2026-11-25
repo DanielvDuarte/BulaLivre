@@ -114,14 +114,23 @@ def clean_lab(s):
 # NOME do produto é (ou começa por) um princípio ativo que a própria base já conhece,
 # preenchemos o campo e marcamos como inferido (pa_inf=1). Isso só IDENTIFICA a
 # molécula — não cria dose nem posologia; essas continuam sendo cadastradas à mão.
-SAIS = ("cloridrato", "sulfato", "fosfato", "succinato", "maleato", "tartarato",
-        "hemitartarato", "hemifumarato", "fumarato", "acetato", "bromidrato", "mesilato",
-        "besilato", "nitrato", "citrato", "sodica", "sodico", "calcica", "calcico",
-        "potassica", "potassico", "dipropionato", "valerato", "propionato", "enantato",
+SAIS = ("cloridrato", "dicloridrato", "sulfato", "fosfato", "diidrogenofosfato", "succinato",
+        "hemissuccinato", "maleato", "tartarato", "hemitartarato", "hemifumarato", "fumarato",
+        "acetato", "bromidrato", "mesilato", "besilato", "nitrato", "citrato", "sodica", "sodico",
+        "calcica", "calcico", "potassica", "potassico", "dipropionato", "propionato", "valerato",
+        "aceponato", "furoato", "cipionato", "pivalato", "xinafoato", "undecilenato", "enantato",
         "decanoato", "pamoato", "estearato", "palmitato", "monoidratada", "monoidratado",
-        "di-hidratada", "di-hidratado", "dihidratada", "dihidratado", "trihidratado",
+        "di-hidratada", "di-hidratado", "dihidratada", "dihidratado", "trihidratada", "trihidratado",
         "triidratado", "anidro", "anidra", "micronizado", "micronizada")
 _SAL_RE = re.compile(r"\b(" + "|".join(SAIS) + r"|de|da|do)\b")
+# tokens vagos que NÃO são princípio ativo (não devem virar PA sozinhos nem contar como componente)
+_VAGOS = re.compile(r"\b(assoc\w*|associac\w*|associad\w*|vitamin\w*|complexo|minerais|mineral|"
+                    r"outros|diversos|excipient\w*|aromatizante\w*|edulcorante\w*)\b")
+# núcleos ambíguos: cátions/ânions que, sozinhos, colidem entre sais diferentes
+# (ex.: 'citrato de sódio' e 'acetato de sódio' reduzem ambos a 'sodio'). Não servem de chave.
+_AMBIGUOS = {"sodio", "sodico", "potassio", "potassico", "calcio", "calcica", "calcico",
+             "magnesio", "ferro", "zinco", "aluminio", "iodo", "fluor", "fluoreto", "cloreto",
+             "selenio", "cobre", "manganes", "cromo", "fosforo", "boro", "molibdenio", "niquel"}
 
 def _nucleo(s):
     """Reduz 'cloridrato de ondansetrona di-hidratado' -> 'ondansetrona'."""
@@ -145,8 +154,39 @@ def _match_pa(nuc_nome, known, known_sorted):
                 return nuc_nome[:-1]
     return None
 
+def _match_loose(nuc_nome, known, known_sorted):
+    """_match_pa + tolerância à grafia 'z'/'s' da ANVISA (dexametazona -> dexametasona)."""
+    hit = _match_pa(nuc_nome, known, known_sorted)
+    if hit:
+        return hit
+    alt = nuc_nome.replace("z", "s")
+    if alt != nuc_nome:
+        return _match_pa(alt, known, known_sorted)
+    return None
+
+def _componentes(nome, known, known_sorted):
+    """Extrai os princípios ativos de um nome de associação ('A + B / C')."""
+    comps = []
+    for parte in re.split(r"\s*[+/]\s*|\bcom\b", norm(nome)):
+        parte = parte.strip()
+        if not parte or _VAGOS.search(parte):
+            continue
+        nuc = _nucleo(parte)
+        if len(nuc) < 4 or nuc in _AMBIGUOS:
+            continue
+        hit = _match_loose(nuc, known, known_sorted)
+        if hit and known[hit] not in comps:
+            comps.append(known[hit])
+    return comps
+
 def backfill_pa(produtos, mapa=None):
-    """Preenche o princípio ativo vazio a partir do nome. Retorna quantos foram inferidos."""
+    """Preenche o princípio ativo vazio a partir do nome. Retorna quantos foram inferidos.
+
+    Só IDENTIFICA a molécula (não cria dose). Regras de segurança:
+    - nome de associação ('+', '/', 'com'): só preenche com >=2 componentes claros,
+      mantendo multi-PA — assim nunca é tratado como substância única na calculadora;
+    - nome simples: vira PA único, exceto nomes vagos ('... associada', 'vitaminas').
+    """
     known = {}
     for p in produtos:
         pa = (p.get("pa") or "").strip()
@@ -156,25 +196,36 @@ def backfill_pa(produtos, mapa=None):
         if len(partes) != 1:                     # só substância única vira dicionário (evita associação)
             continue
         nuc = _nucleo(partes[0])
-        if len(nuc) >= 5 and "+" not in nuc:
+        if len(nuc) >= 5 and "+" not in nuc and nuc not in _AMBIGUOS:
             known.setdefault(nuc, partes[0].strip())
     known_sorted = sorted(known, key=len, reverse=True)
+
+    def _aplica(p, pa_valor):
+        p["pa"] = pa_valor
+        p["pa_inf"] = 1
+        if mapa is not None and not p.get("sintomas"):
+            p["sintomas"] = resolve_sintomas(pa_valor, mapa)
+
     n_inf = 0
     for p in produtos:
         if (p.get("pa") or "").strip():
             continue
         nome = p.get("nome") or ""
-        if "+" in nome or " com " in (" " + norm(nome) + " "):
-            continue                             # associação declarada no nome: não inferir
-        nuc = _nucleo(nome)
-        if len(nuc) < 5:
+        nnome = norm(nome)
+        if "+" in nome or "/" in nome or " com " in (" " + nnome + " "):
+            comps = _componentes(nome, known, known_sorted)
+            if len(comps) >= 2:                  # associação com componentes claros -> multi-PA
+                _aplica(p, ", ".join(comps))
+                n_inf += 1
+            continue                             # associação sem 2 componentes: deixa vazio (não arrisca PA único)
+        if _VAGOS.search(nnome):                 # 'Dexametazona Associada', 'Vitaminas...' -> não inferir
             continue
-        hit = _match_pa(nuc, known, known_sorted)
+        nuc = _nucleo(nome)
+        if len(nuc) < 5 or nuc in _AMBIGUOS:
+            continue
+        hit = _match_loose(nuc, known, known_sorted)
         if hit:
-            p["pa"] = known[hit]
-            p["pa_inf"] = 1
-            if mapa is not None and not p.get("sintomas"):
-                p["sintomas"] = resolve_sintomas(p["pa"], mapa)
+            _aplica(p, known[hit])
             n_inf += 1
     return n_inf
 

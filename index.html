@@ -446,18 +446,35 @@ function href(path,params){
 // Bulário Eletrônico da ANVISA: abre a consulta já com o nome do produto preenchido
 const bulaUrl = p => "https://consultas.anvisa.gov.br/#/bulario/?nomeProduto="+encodeURIComponent(p.nome);
 const hMed = p => "#/medicamento/"+encodeURIComponent(p.id);
-// Canal de CONTRIBUIÇÃO de dose (vai para revisão de um profissional antes de entrar na calculadora).
-// Abre uma issue no GitHub já preenchida; o mantenedor valida e só então cadastra em DOSES.
+// ===== Canal de CONTRIBUIÇÃO de dose (vai para revisão de um profissional antes de entrar na calculadora) =====
+// Por padrão abre uma issue no GitHub já preenchida. Para usar um GOOGLE FORM (mais acessível
+// para quem não tem conta no GitHub), crie um formulário com estas perguntas e, em cada uma,
+// pegue o id "entry.XXXXXXX" (menu ⋮ → "Obter link pré-preenchido" → copie a URL e leia os entry.*).
+// Preencha CONTRIB_FORM.base com a URL que termina em /viewform e cada id em CONTRIB_FORM.campos.
+// Deixando base = "" o app continua usando a issue do GitHub (não quebra nada).
+const CONTRIB_FORM = {
+  base: "",   // ex.: "https://docs.google.com/forms/d/e/1FAIpQLSxxxx/viewform"
+  campos: { produto:"", laboratorio:"", principioAtivo:"", contexto:"" }  // ex.: "entry.1234567"
+};
 const REPO_CONTRIB = "DanielvDuarte/BulaLivre";
 function sugerirDoseUrl(p, ctx){
   const pa = (p && p.pa) ? p.pa : "(não informado)";
+  const paTxt = pa + (p&&p.pa_inf ? " (identificado pelo nome — confirmar)" : "");
+  // Opção A: Google Form pré-preenchido (se configurado)
+  if(CONTRIB_FORM.base){
+    const q=new URLSearchParams(), C=CONTRIB_FORM.campos, add=(k,v)=>{ if(C[k]&&v) q.append(C[k],v); };
+    add("produto", p?p.nome:""); add("laboratorio", p&&p.laboratorio?p.laboratorio:"");
+    add("principioAtivo", paTxt); add("contexto", ctx||"");
+    return CONTRIB_FORM.base + (CONTRIB_FORM.base.includes("?")?"&":"?") + q.toString();
+  }
+  // Opção B (padrão): issue do GitHub já preenchida
   const title = "[Dose para revisão] "+(p?p.nome:"")+" — "+pa;
   const body =
     "## Sugestão de dose de referência (precisa de validação profissional)\n\n"+
     "> ⚠️ Não inclua dados de paciente. A dose só entra na calculadora depois de revisada por um profissional de saúde.\n\n"+
     "- **Produto:** "+(p?p.nome:"")+"\n"+
     "- **Laboratório:** "+(p&&p.laboratorio?p.laboratorio:"—")+"\n"+
-    "- **Princípio ativo:** "+pa+(p&&p.pa_inf?" (identificado pelo nome — confirmar)":"")+"\n"+
+    "- **Princípio ativo:** "+paTxt+"\n"+
     (ctx?"- **Contexto:** "+ctx+"\n":"")+
     "\n### Preencha o que souber (fonte: bula do profissional ou diretriz)\n"+
     "- Dose adulto (mg por dose): \n"+
