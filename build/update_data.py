@@ -109,6 +109,75 @@ def clean_lab(s):
     s = re.sub(r"^\s*\d[\d./\-]{9,}\s*[-–]\s*", "", s)
     return title_br(s)
 
+# ---- preenchimento do princípio ativo a partir do nome do produto ----
+# A ANVISA deixa a coluna de princípio ativo vazia em ~20% dos registros. Quando o
+# NOME do produto é (ou começa por) um princípio ativo que a própria base já conhece,
+# preenchemos o campo e marcamos como inferido (pa_inf=1). Isso só IDENTIFICA a
+# molécula — não cria dose nem posologia; essas continuam sendo cadastradas à mão.
+SAIS = ("cloridrato", "sulfato", "fosfato", "succinato", "maleato", "tartarato",
+        "hemitartarato", "hemifumarato", "fumarato", "acetato", "bromidrato", "mesilato",
+        "besilato", "nitrato", "citrato", "sodica", "sodico", "calcica", "calcico",
+        "potassica", "potassico", "dipropionato", "valerato", "propionato", "enantato",
+        "decanoato", "pamoato", "estearato", "palmitato", "monoidratada", "monoidratado",
+        "di-hidratada", "di-hidratado", "dihidratada", "dihidratado", "trihidratado",
+        "triidratado", "anidro", "anidra", "micronizado", "micronizada")
+_SAL_RE = re.compile(r"\b(" + "|".join(SAIS) + r"|de|da|do)\b")
+
+def _nucleo(s):
+    """Reduz 'cloridrato de ondansetrona di-hidratado' -> 'ondansetrona'."""
+    s = norm(s)
+    s = _SAL_RE.sub(" ", s)
+    s = re.sub(r"[^a-z0-9+ ]", " ", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+def _match_pa(nuc_nome, known, known_sorted):
+    """Encontra o princípio ativo conhecido que corresponde ao núcleo do nome."""
+    if nuc_nome in known:
+        return nuc_nome
+    for k in known_sorted:                       # nome começa por "<ativo> ..." (ex.: "Dipirona Genérico")
+        if nuc_nome.startswith(k + " "):
+            return k
+    if len(nuc_nome) >= 7:                        # variação PT/EN no fim (ondansetron <-> ondansetrona)
+        for suf in ("a", "o", "e"):
+            if nuc_nome + suf in known:
+                return nuc_nome + suf
+            if nuc_nome.endswith(suf) and nuc_nome[:-1] in known:
+                return nuc_nome[:-1]
+    return None
+
+def backfill_pa(produtos, mapa=None):
+    """Preenche o princípio ativo vazio a partir do nome. Retorna quantos foram inferidos."""
+    known = {}
+    for p in produtos:
+        pa = (p.get("pa") or "").strip()
+        if not pa:
+            continue
+        partes = [x for x in pa.split(",") if x.strip()]
+        if len(partes) != 1:                     # só substância única vira dicionário (evita associação)
+            continue
+        nuc = _nucleo(partes[0])
+        if len(nuc) >= 5 and "+" not in nuc:
+            known.setdefault(nuc, partes[0].strip())
+    known_sorted = sorted(known, key=len, reverse=True)
+    n_inf = 0
+    for p in produtos:
+        if (p.get("pa") or "").strip():
+            continue
+        nome = p.get("nome") or ""
+        if "+" in nome or " com " in (" " + norm(nome) + " "):
+            continue                             # associação declarada no nome: não inferir
+        nuc = _nucleo(nome)
+        if len(nuc) < 5:
+            continue
+        hit = _match_pa(nuc, known, known_sorted)
+        if hit:
+            p["pa"] = known[hit]
+            p["pa_inf"] = 1
+            if mapa is not None and not p.get("sintomas"):
+                p["sintomas"] = resolve_sintomas(p["pa"], mapa)
+            n_inf += 1
+    return n_inf
+
 def resolve_sintomas(pa_text, mapa):
     npa = norm(pa_text)
     if not npa:
@@ -185,6 +254,9 @@ def main():
         })
         if args.max and len(produtos) >= args.max:
             break
+
+    n_inf = backfill_pa(produtos, mapa)
+    print(f"[info] princípio ativo inferido pelo nome em {n_inf} produtos", file=sys.stderr)
 
     produtos.sort(key=lambda p: norm(p["nome"]))
     now = datetime.datetime.now(datetime.timezone.utc)

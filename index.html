@@ -278,6 +278,8 @@
   .chip2.muted{color:var(--muted);border-radius:10px}
   .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px}
   .b-ok{background:var(--ok-bg);color:var(--ok)}.b-pend{background:var(--warn-bg);color:var(--warn)}.b-none{background:var(--surface2);color:var(--muted)}
+  .b-saved{background:var(--brand-soft);color:var(--brand)}
+  .lnk{background:none;border:none;padding:0;margin-left:6px;color:var(--brand);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer}
   .rev{margin:2px 0 10px;font-size:12.5px;color:var(--muted)}
   .how{margin-top:12px;font-size:13.5px;color:var(--muted)}
   .how ol{margin:6px 0 8px;padding-left:20px}
@@ -444,6 +446,31 @@ function href(path,params){
 // Bulário Eletrônico da ANVISA: abre a consulta já com o nome do produto preenchido
 const bulaUrl = p => "https://consultas.anvisa.gov.br/#/bulario/?nomeProduto="+encodeURIComponent(p.nome);
 const hMed = p => "#/medicamento/"+encodeURIComponent(p.id);
+// Canal de CONTRIBUIÇÃO de dose (vai para revisão de um profissional antes de entrar na calculadora).
+// Abre uma issue no GitHub já preenchida; o mantenedor valida e só então cadastra em DOSES.
+const REPO_CONTRIB = "DanielvDuarte/BulaLivre";
+function sugerirDoseUrl(p, ctx){
+  const pa = (p && p.pa) ? p.pa : "(não informado)";
+  const title = "[Dose para revisão] "+(p?p.nome:"")+" — "+pa;
+  const body =
+    "## Sugestão de dose de referência (precisa de validação profissional)\n\n"+
+    "> ⚠️ Não inclua dados de paciente. A dose só entra na calculadora depois de revisada por um profissional de saúde.\n\n"+
+    "- **Produto:** "+(p?p.nome:"")+"\n"+
+    "- **Laboratório:** "+(p&&p.laboratorio?p.laboratorio:"—")+"\n"+
+    "- **Princípio ativo:** "+pa+(p&&p.pa_inf?" (identificado pelo nome — confirmar)":"")+"\n"+
+    (ctx?"- **Contexto:** "+ctx+"\n":"")+
+    "\n### Preencha o que souber (fonte: bula do profissional ou diretriz)\n"+
+    "- Dose adulto (mg por dose): \n"+
+    "- Dose pediátrica (mg/kg por dose ou por dia): \n"+
+    "- Intervalo usual (h): \n"+
+    "- Dose máxima (diária / por dose): \n"+
+    "- Apresentações (ex.: 4 mg/mL, comp. 8 mg): \n"+
+    "- Observações / cuidados (renal, idade mínima, etc.): \n"+
+    "- **Fonte** (bula, diretriz, consenso): \n"+
+    "- Sugerido por (nome e CRM/CRF, opcional): \n";
+  return "https://github.com/"+REPO_CONTRIB+"/issues/new?labels="+encodeURIComponent("dose-para-revisao")+
+    "&title="+encodeURIComponent(title)+"&body="+encodeURIComponent(body);
+}
 const hList = (kind,name) => "#/lista/"+kind+"/"+encodeURIComponent(name);
 
 let lastQ="";
@@ -824,6 +851,7 @@ function viewDetail(id){
         ${p.classe?`<div><dt>Classe terapêutica</dt><dd>${esc(p.classe)}</dd></div>`:""}
         ${p.cat?`<div><dt>Categoria</dt><dd>${esc(p.cat)}</dd></div>`:""}
       </dl>
+      ${p.pa_inf?`<div class="cuso" style="margin-top:6px">ℹ️ Princípio ativo <b>identificado pelo nome do produto</b> — a base da ANVISA veio sem esse campo. Confirme na bula.</div>`:""}
       ${usoBlk?`<div class="blk"><h2>Para que serve</h2>${usoBlk}</div>`:""}
       ${pats?`<div class="blk"><h2>Sintomas / patologias relacionados</h2><div class="links">${pats}</div></div>`:""}
       ${efBlk?`<div class="blk"><h2>Efeitos colaterais possíveis</h2>${efBlk}</div>`:""}
@@ -835,7 +863,7 @@ function viewDetail(id){
       ${doseFor(p)&&CIN[doseFor(p).id]?`<div class="blk"><h2>Dinâmica e cinética (referência)</h2>${cinHtml(doseFor(p).id)}</div>`:""}
       <div class="blk">${doseFor(p)
         ? `<a class="btn pri" href="#/calculadora/${doseFor(p).id}?p=${encodeURIComponent(p.id)}">🧮 Calcular dose deste medicamento</a>`
-        : `<a class="btn pri" href="#/calculadora/livre?p=${encodeURIComponent(p.id)}">🧮 Calcular dose (cálculo manual)</a><div class="cuso" style="margin-top:8px">Este princípio ativo ainda não tem doses de referência cadastradas: no cálculo manual você informa a dose prescrita e o app faz a conta (sem faixas nem alertas de segurança).</div>`}</div>
+        : `<a class="btn pri" href="#/calculadora/livre?p=${encodeURIComponent(p.id)}">🧮 Calcular dose (cálculo manual)</a><div class="cuso" style="margin-top:8px">Este princípio ativo ainda não tem doses de referência cadastradas: no cálculo manual você informa a dose prescrita e o app faz a conta (sem faixas nem alertas de segurança).</div><div style="margin-top:10px"><a class="btn" href="${sugerirDoseUrl(p,"página do medicamento")}" target="_blank" rel="noopener noreferrer">➕ Sugerir a dose deste medicamento (para revisão)</a></div><div class="cuso" style="margin-top:6px">É profissional de saúde e conhece a dose? Envie para revisão — depois de validada, ela passa a aparecer na calculadora para todos.</div>`}</div>
       ${groups.length?"":`<div class="blk"><p class="muted">Ainda não temos resumo de uso e efeitos colaterais para este princípio ativo. Consulte a bula do produto.</p></div>`}
       ${groups.length?`<div class="alert info">Informações gerais sobre o princípio ativo, em linguagem simples. Nem todo efeito listado acontece com todo mundo, e a lista não é completa: leia a <b>bula do produto</b> e fale com seu médico ou farmacêutico.</div>`:""}
     </article>
@@ -1184,7 +1212,7 @@ function viewCalc(){
   const opts=a=>a.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");
   return `<div class="page calc">
     <h1 class="title">Calculadora de dose</h1>
-    <div class="sub noprint">Calcule quanto dar a cada dose, o total do tratamento e as embalagens, para adultos e crianças. Nada digitado aqui é salvo ou enviado.</div>
+    <div class="sub noprint">Calcule quanto dar a cada dose, o total do tratamento e as embalagens, para adultos e crianças. <b>Os dados do paciente não são salvos nem enviados.</b> As doses que você ajustar ficam guardadas só neste aparelho, para repor da próxima vez.</div>
     <div class="legend noprint"><b>Como ler os campos:</b>
       <span class="tg req">obrigatório</span> precisa preencher ·
       <span class="tg opt">opcional</span> melhora os alertas ·
@@ -1198,6 +1226,7 @@ function viewCalc(){
           <label class="fl">Princípio ativo<select id="cDrug"></select></label>
           <div class="cuso" id="cUso"></div>
           <div class="rev" id="cRev"></div>
+          <div class="rev" id="cSaved"></div>
           <details class="opt"><summary>Por que só alguns medicamentos?</summary><div class="cuso" id="cAvail"></div></details></section>
         <section class="cx"><h2><span>2</span>Paciente<em class="st" id="st2"></em></h2>
           <p class="help">A <b>idade</b> define se o cálculo é de criança (mg/kg) ou de adulto (dose fixa). O <b>peso</b> é obrigatório quando a dose é por mg/kg.</p>
@@ -1301,7 +1330,7 @@ function initCalc(drugId,params){
     Object.keys(dirty).forEach(k=>dirty[k]=false);
     applySug(true);
     setOpts(g("cAp"),drug.apres.map(a=>[a.id,esc(a.rot)]).concat([["_x","Outra apresentação…"]]),drug.apres.length?drug.apres[0].id:"_x");
-    loadAp(); brandList();
+    loadAp(); brandList(); profApply();
   }
   function loadAp(){
     const a=drug.apres.find(x=>x.id===g("cAp").value), custom=!a;
@@ -1385,6 +1414,41 @@ function initCalc(drugId,params){
     g("cRecent").querySelectorAll("button").forEach(b=>b.onclick=()=>{ dsel.value=b.dataset.id; dsel.onchange(); });
   }
 
+  /* ---- memória da dose do profissional (só posologia/apresentação; NUNCA dados do paciente) ---- */
+  const PROF_KEY="bl_doses_prof";
+  function profGet(){ try{ return JSON.parse(localStorage.getItem(PROF_KEY)||"{}"); }catch(e){ return {}; } }
+  function profSave(){
+    if(drug===LIVRE) return;                       // cálculo manual não tem chave estável: não guarda
+    if(!(numBR(g("cDose").value)>0)) return;
+    if(!(dirty.dose||dirty.int||dirty.dias||dirty.modo||dirty.ap||dirty.conc)) return; // só salva o que o profissional ajustou
+    try{
+      const all=profGet();
+      all[drug.id]={ modo:g("cModo").value, dose:g("cDose").value, int:g("cInt").value, dias:g("cDias").value,
+        apId:g("cAp").value, tipo:g("cTipo").value, conc:g("cConc").value, gotas:g("cGotas").value,
+        pack:g("cPack").value, partir:g("cPartir").checked, at:Date.now() };
+      localStorage.setItem(PROF_KEY,JSON.stringify(all));
+    }catch(e){}
+  }
+  function profForget(){ try{ const all=profGet(); delete all[drug.id]; localStorage.setItem(PROF_KEY,JSON.stringify(all)); }catch(e){} }
+  function profApply(){
+    const bn=g("cSaved"); const rec=profGet()[drug.id];
+    if(!rec){ if(bn) bn.innerHTML=""; return; }
+    if(rec.modo){ g("cModo").value=rec.modo; dirty.modo=true; }
+    intervals();
+    if(rec.dose!==undefined && rec.dose!==""){ g("cDose").value=rec.dose; dirty.dose=true; }
+    if(rec.int){ if(![...g("cInt").options].some(o=>o.value==rec.int)){ const o=document.createElement("option"); o.value=rec.int; o.textContent="a cada "+rec.int+" h"; g("cInt").appendChild(o); } g("cInt").value=rec.int; dirty.int=true; }
+    if(rec.dias){ g("cDias").value=rec.dias; dirty.dias=true; }
+    if(rec.apId && [...g("cAp").options].some(o=>o.value===rec.apId)){ g("cAp").value=rec.apId; loadAp(); }
+    if(rec.tipo){ g("cTipo").value=rec.tipo; tipoUI(); }
+    if(rec.conc!==undefined && rec.conc!==""){ g("cConc").value=rec.conc; dirty.conc=true; }
+    if(rec.gotas) g("cGotas").value=rec.gotas;
+    if(rec.pack) g("cPack").value=rec.pack;
+    if(rec.partir!==undefined) g("cPartir").checked=rec.partir;
+    faixa();
+    if(bn){ const when=rec.at?new Date(rec.at).toLocaleDateString("pt-BR"):""; bn.innerHTML=`<span class="badge b-saved">💾 Sua dose usual (salva só neste aparelho${when?`, em ${when}`:""})</span> <button type="button" class="lnk" id="cForget">usar a sugestão padrão ↺</button>`;
+      const fb=g("cForget"); if(fb) fb.onclick=()=>{ profForget(); delete g("cBrand").dataset.touched; loadDrug(); recalc(); toast("Voltou para a dose sugerida"); }; }
+  }
+
   /* ---- resultado ---- */
   function guide(miss,first){
     return `<div class="rx empty-rx"><div class="rx-h">Resultado</div>
@@ -1402,7 +1466,7 @@ function initCalc(drugId,params){
     if(miss.length){ out.innerHTML=guide(miss); return; }
     const r=calcDose(drug,i);
     if(!r.ok){ out.innerHTML=guide([{t:r.erro}]); return; }
-    recentAdd(drug.id); recentDraw();
+    recentAdd(drug.id); recentDraw(); profSave();
     const bp=g("cBrand").value?BY_ID.get(g("cBrand").value):null;
     const apObj=drug.apres.find(x=>x.id===g("cAp").value);
     const apRot=apObj?apObj.rot:(g("cTipo").value==="comp"?"comprimido ":"líquido ")+g("cConc").value.replace(".",",")+(g("cTipo").value==="comp"?" mg":" mg/mL");
@@ -1423,6 +1487,10 @@ function initCalc(drugId,params){
     const ico=n=>n==="perigo"?"⛔":n==="aviso"?"⚠️":n==="ok"?"✅":"ℹ️";
     const body=`${(drug.revisao||drug===LIVRE)?"":`<div class="al al-aviso">⚠️ As doses de referência deste medicamento ainda <b>não foram validadas por profissional</b>. Confirme na bula.</div>`}`;
     const fb="https://github.com/DanielvDuarte/BulaLivre/issues/new?title="+encodeURIComponent("[Calculadora] "+drug.nome+": ")+"&body="+encodeURIComponent("Medicamento: "+drug.nome+"\nApresentação: "+apRot+"\n\nO que está errado ou o que sugere? (não inclua dados do paciente)\n");
+    // contribuição de dose: só no cálculo manual (medicamento sem referência) e com um produto escolhido
+    const prodContrib = bp || preP;
+    const posologiaTxt = (i.modo==="fixa" ? fmt(i.dose)+" mg por dose (fixa)" : fmt(i.dose)+" mg/kg por "+(r.nativa==="dose"?"dose":"dia"))+", a cada "+i.intervalo+" h, por "+i.dias+" dia(s)";
+    const contribUrl = (drug===LIVRE && prodContrib) ? sugerirDoseUrl(prodContrib, "via cálculo manual — posologia informada: "+posologiaTxt+" (sem dados de paciente)") : null;
     out.innerHTML=`<div class="rx${worst?" rx-bad":""} noprint-sheet">
       <div class="rx-h">Prescrição calculada <small>${ped?"criança/adolescente":"adulto"}</small></div>
       <div class="rx-big">${fmt(r.qty)} <span>${r.unidade}</span></div>
@@ -1442,7 +1510,7 @@ function initCalc(drugId,params){
       <details class="opt" open><summary>Como foi calculado (passo a passo)</summary><ol class="steps">${r.passos.map(p=>`<li>${esc(p)}</li>`).join("")}</ol></details>
       <details class="opt"><summary>Conferência de segurança</summary><ul class="checks">${r.checks.map(c=>`<li class="c-${c.n}">${ico(c.n)} ${esc(c.t)}</li>`).join("")}</ul></details>
       ${al.some(a=>a.n==="info")?`<details class="opt"><summary>Observações sobre este medicamento</summary>${al.filter(a=>a.n==="info").map(a=>`<div class="al al-info">ℹ️ ${esc(a.t)}</div>`).join("")}</details>`:""}
-      <div class="rx-btns noprint"><button class="btn pri" id="cCopy" type="button">Copiar texto</button><button class="btn" id="cPrint" type="button">Imprimir orientação</button><a class="btn" href="${fb}" target="_blank" rel="noopener noreferrer">Reportar erro</a></div>
+      <div class="rx-btns noprint"><button class="btn pri" id="cCopy" type="button">Copiar texto</button><button class="btn" id="cPrint" type="button">Imprimir orientação</button>${contribUrl?`<a class="btn" href="${contribUrl}" target="_blank" rel="noopener noreferrer">➕ Sugerir esta dose para revisão</a>`:""}<a class="btn" href="${fb}" target="_blank" rel="noopener noreferrer">Reportar erro</a></div>
       <button class="rx-mini noprint" id="cMini" type="button"><span>${fmt(r.qty)} ${r.unidade} · ${i.intervalo} h · ${i.dias} d</span><b>ver resultado ↓</b></button>
     </div>
     ${CIN[drug.id]?`<details class="opt noprint"><summary>Dinâmica e cinética (referência)</summary>${cinHtml(drug.id)}</details>`:""}
